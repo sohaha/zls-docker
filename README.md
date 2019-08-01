@@ -36,16 +36,18 @@
 
 1. 安装git、 docker 和 docker-compose
 
-```bash
-# 如果不是root用户，需将当前用户加入docker用户组
-sudo gpasswd -a ${USER} docker
-```
+如不清楚如果不熟悉怎么安装 docker ，
+执行可以拉取项目后执行 ./run.sh instal 查看相关安装命令。
 
-2. clone项目：
+如果不是root用户或提示权限问题，可将当前用户加入docker用户组 `sudo gpasswd -a ${USER} docker`。
+
+
+2. 拉取项目
 
 ```bash
 git clone --depth=1 https://github.com/sohaha/zls-docker.git
 ```
+
 
 3. 拷贝配置文件
 
@@ -63,7 +65,7 @@ cp .env.example .env
 # Windows 请执行 docker-compose up nginx mysql php72
 ```
 
-5. 访问在浏览器中访问 http://localhost/
+5. 访问在浏览器中访问 http://localhost/ 。
 
 ## 配置设置
 
@@ -73,18 +75,31 @@ cp .env.example .env
 # 编辑.env文件，
 # 从扩展列表 PHP7.2 extensions 中选择相应的扩展，
 # 添加（移除）到 PHP72_EXTENSIONS 中，英文逗号隔开
-PHP72_EXTENSIONS=curl,opcache,redis
+PHP72_EXTENSIONS=swoole,redis
 
 # 重新编译 PHP 镜像并启动
-./run.sh build php72 && ./run.sh up php72
+./run.sh buildUp php72
 # Windows 请执行 docker-compose build php72 && docker-compose up php72 -d
 ```
+
+### 数据库密码
+
+如需修改默认密码，编辑.env文件即可，
+
+MySQL：`MYSQL_ROOT_PASSWORD=666666`，
+
+mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
+
+必须在容器生成之前，如果容器已经生成过，
+
+请使用bash进入容器内修改，具体方法请谷歌。
+
 
 ## 日常使用
 
 ### 命令行
 
-如要使用 composer，启动 swoole ，或 npm 安装等等
+如要使用 composer，启动 swoole ，或 npm 安装等等。
 
 ```bash
 ./run.sh composer install zls/wechat
