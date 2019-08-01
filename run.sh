@@ -163,7 +163,7 @@ function _php(){
     local cmd
     cmd=$1
     if [[ "composer" = $cmd ]];then
-        docker run --tty --interactive --rm --user $(id -u):$(id -g) --volume $WORK_DIR/composer:/tmp --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $(pwd):/app composer
+        docker run --tty --interactive --rm --user $(id -u):$(id -g) --volume $WORK_DIR/data/composer:/tmp --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $(pwd):/app composer
     else
         images $phpv
         _bash $phpv php $@
