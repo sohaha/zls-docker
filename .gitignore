@@ -4,4 +4,4 @@
 .vscode/
 www/*
 !www/localhost/
-!.gitignore
+/docker-compose.yml

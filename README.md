@@ -36,8 +36,13 @@
 
 1. 安装git、 docker 和 docker-compose
 
-如不清楚如果不熟悉怎么安装 docker ，
-执行可以拉取项目后执行 ./run.sh instal 查看相关安装命令。
+docker 19以上
+
+docker-compose 3
+
+系统自带的 yum、apt 安装版本太老了，
+如不清楚如果不熟悉怎么安装 docker，
+执行可以拉取项目后执行 ./run.sh installDocker 查看相关安装命令。
 
 如果不是root用户或提示权限问题，可将当前用户加入docker用户组 `sudo gpasswd -a ${USER} docker`。
 
@@ -48,26 +53,23 @@
 git clone --depth=1 https://github.com/sohaha/zls-docker.git
 ```
 
-
-3. 拷贝配置文件
-
-```bash
-cd zls-docker
-cp .env.example .env
-```
-
-4. 启动
+3. 启动
 
 ```bash
 # 更多命令直接执行 run.sh 查看
 ./run.sh up
 
-# Windows 请执行 docker-compose up nginx mysql php72
+# Windows 请先复制配置再执行启动命令
+copy .env.example .env
+copy docker-compose.yml.example docker-compose.yml
+docker-compose up nginx mysql php72
 ```
 
 5. 访问在浏览器中访问 http://localhost/ 。
 
 ## 配置设置
+
+更多配置请打开 .env 文件查看。
 
 ### php 扩展
 
@@ -79,6 +81,7 @@ PHP72_EXTENSIONS=swoole,redis
 
 # 重新编译 PHP 镜像并启动
 ./run.sh buildUp php72
+
 # Windows 请执行 docker-compose build php72 && docker-compose up php72 -d
 ```
 
@@ -97,6 +100,17 @@ mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
 
 ## 日常使用
 
+### 安装脚本
+
+建议把脚本安装至系统中，方便使用
+```bash
+./run.sh tools
+# 输入1，自动安装至系统，然后就可以全局使用 zdocker
+
+zdocker help
+```
+
+
 ### 命令行
 
 如要使用 composer，启动 swoole ，或 npm 安装等等。
@@ -109,10 +123,15 @@ mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
 ...
 ```
 
-### 重载 Nginx
+### 重新加载
+
+nginx，php-fpm之类的修改了配置是需要重新加载的，可使用该命令
 
 ```bash
+# 不值得容器默认为nginx，下面命令等同 ./run.sh reload nginx
 ./run.sh reload
+
+./run.sh reload php72
 ```
 
 ### 进入容器
@@ -123,7 +142,16 @@ mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
 ```
 
 ### 停止容器
+
 ```bash
 # ./run.sh stop 容器名称（空表示停止全部）
 ./run.sh stop nginx
+```
+
+### 工具箱
+
+一些常用的操作，如 php-fpm 优化，清理没用使用的容器等等
+
+```bash
+./run.sh tools
 ```

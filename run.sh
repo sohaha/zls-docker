@@ -7,29 +7,41 @@ defaultContainer="nginx php72 mysql"
 # Default Service
 defaultBashContainer="php72"
 
+mydir=$0
+_b=$(ls -ld $mydir | awk '{print $NF}')
+_c=$(ls -ld $mydir | awk '{print $(NF-2)}')
+[[ $_b =~ ^/ ]] && mydir=$_b || mydir=$(dirname $_c)/$_b
+
 WORK_DIR=$(
-  cd $(dirname $0)
+  cd $(dirname $mydir)
   pwd
 )
 WORK_NAME=${WORK_DIR##*/}
+SOURCE_DIR=$(pwd)
+
+cd $WORK_DIR
 
 function main() {
   local cmd
+  config
   judge
   cmd=$1
   if [[ "" != $1 ]] && [[ "help" != $1 ]] && [[ "node" != $1 ]] && [[ "npm" != $1 ]] && [[ "go" != $1 ]] && [[ "composer" != $1 ]]; then
     shift
   fi
   case "$cmd" in
-  status)
+  status | s)
     _status $@
     ;;
   stop)
     _stop $@
     ;;
-  buildUp)
+  buildUp | buildup)
     _build $@
     _start $@
+    ;;
+  restart)
+    _restart $@
     ;;
   start | up)
     _start $@
@@ -58,17 +70,20 @@ function main() {
   certbot)
     _certbot $@
     ;;
-  stop_all)
+  stop_all | stopAll | stopall)
     docker ps -a -q
     ;;
-  clear_all)
-    docker container prune
-    ;;
-  delete_all)
+  delete_all | deleteAll | deleteall)
     docker system prune -a
     ;;
-  install)
+  tools)
+    _tools
+    ;;
+  installDocker | installdocker)
     _installDocker
+    ;;
+  help)
+    _help $@
     ;;
   *)
     _help $@
@@ -78,6 +93,8 @@ function main() {
 }
 
 function _help() {
+  local cmd=${BASH_SOURCE[0]}
+  cmd=$(echo $cmd | sed 's:\/usr\/bin\/::g')
   echo '        .__                        .___                __                   '
   echo '________|  |    ______           __| _/ ____    ____  |  | __  ____ _______ '
   echo '\___   /|  |   /  ___/  ______  / __ | /  _ \ _/ ___\ |  |/ /_/ __ \\_  __ \'
@@ -85,17 +102,21 @@ function _help() {
   echo '/_____ \|____//____  >         \____ | \____/  \___  >|__|_ \ \___  >|__|   '
   echo '      \/           \/               \/             \/      \/     \/        '
   echo ''
-  tips " start        Start up service"
-  tips " stop         Stop of Service"
-  tips " reload       Reload Services"
-  tips " status       View status"
-  tips " bash         Exec Services"
-  tips " build        Build services"
-  tips " buildUp      Build and start services"
+  tips " $cmd start        Start up service"
+  tips " $cmd stop         Stop of Service"
+  tips " $cmd reload       Reload Services"
+  tips " $cmd restart      Restart Services"
+  tips " $cmd status       View status"
+  tips " $cmd stats        Display resources used"
+  tips " $cmd bash         Exec Services"
+  tips " $cmd build        Build services"
+  tips " $cmd buildUp      Build and start services"
+  tips " $cmd tools        Toolbox"
   echo ''
-  tips " Designated Language Directives(php, node, npm, golang, composer)"
-  tips " ${BASH_SOURCE[0]} php -v"
-  tips " ${BASH_SOURCE[0]} npm install xxx"
+  echo " Designated Language Directives(php, node, npm, golang, composer)"
+  echo " $cmd php -v"
+  echo " $cmd npm install xxx"
+  echo ' ......'
 }
 
 function judge() {
@@ -113,8 +134,31 @@ function judge() {
 }
 
 function askRoot() {
-  if [ $(id -u) != 0 ];then
+  if [ $(id -u) != 0 ]; then
     error "You must be root to run this script, please use root run"
+  fi
+}
+
+function config() {
+  local dockerComposePath="$WORK_DIR/docker-compose.yml"
+  local configPath="$WORK_DIR/.env"
+
+  if [[ ! -f $configPath ]]; then
+    cp $configPath".example" $configPath
+    if [ $? -ne 0 ]; then
+      error ".env does not exist, initialize Error."
+    else
+      tips ".env does not exist, initialize."
+    fi
+  fi
+
+  if [[ ! -f $dockerComposePath ]]; then
+    cp $dockerComposePath".example" $dockerComposePath
+    if [ $? -ne 0 ]; then
+      error "docker-compose.yml does not exist, initialize Error."
+    else
+      tips "docker-compose.yml does not exist, initialize."
+    fi
   fi
 }
 
@@ -122,7 +166,7 @@ function _installDocker() {
   #askRoot
   local info=$(cat /etc/os-release)
   if [[ "" != $(echo $info | grep CentOS) ]]; then
-    tips 'Is CentOS'
+    tips 'OS is CentOS'
     tips 'command:'
     tips "        sudo yum install -y yum-utils device-mapper-persistent-data lvm2"
     tips "        sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"
@@ -130,7 +174,7 @@ function _installDocker() {
     tips "start:  "
     tips "        sudo systemctl start docker"
   elif [[ "" != $(echo $info | grep Ubuntu) ]]; then
-    tips 'Is Ubuntu'
+    tips 'OS is Ubuntu'
     tips 'command:'
     tips "        sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common"
     tips "        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
@@ -141,6 +185,54 @@ function _installDocker() {
   else
     tips "See: https://docs.docker.com/install/"
   fi
+}
+
+function _install() {
+  #askRoot
+  sudo ln -s $WORK_DIR/run.sh /usr/bin/zdocker
+  tips "You can now use zdocker instead of ./run.sh: "
+  tips "  zdocker up"
+  tips "  zdocker help"
+}
+
+function _tools() {
+  tips "********please enter your choise:(1-6)****"
+  cat <<EOF
+  (1) Install script into system bin
+  (2) Optimize php-fpm conf
+  (3) Clean up all stopped containers
+  (0) Exit
+EOF
+  read -p "Now select the top option to: " input
+  case $input in
+  1)
+    _install
+    ;;
+  2)
+    optimizePHPFpm
+    ;;
+  3)
+    docker container prune
+    ;;
+  0)
+    exit 1
+    ;;
+  *)
+    echo "Please enter the correct option"
+    ;;
+  esac
+  #  optimize
+}
+
+function optimizePHPFpm() {
+  tips "optimize php-fpm.conf"
+  local mem=$(free -m | awk '/Mem:/{print $2}')
+  local conf="$WORK_DIR/config/php/php-fpm.conf"
+  sed -i "s@^pm.max_children.*@pm.max_children = $(($mem / 2 / 20))@" $conf
+  sed -i "s@^pm.start_servers.*@pm.start_servers = $(($mem / 2 / 30))@" $conf
+  sed -i "s@^pm.min_spare_servers.*@pm.min_spare_servers = $(($mem / 2 / 40))@" $conf
+  sed -i "s@^pm.max_spare_servers.*@pm.max_spare_servers = $(($mem / 2 / 20))@" $conf
+  _reload php72
 }
 
 function _bash() {
@@ -182,17 +274,33 @@ function _start() {
   docker-compose up -d $container
 }
 
-function _reload() {
+function _restart() {
   local container
   container=$@
   if [[ "" == $container ]]; then
+    echo "No service is specified (default service): $defaultContainer"
+    container=$defaultContainer
+  fi
+  docker-compose restart $container
+}
+
+function _reload() {
+  local container=$@
+  if [[ "" == $container ]]; then
     container="nginx"
   fi
-  if [[ "nginx" == $container ]]; then
+
+  case $container in
+  php72)
+    _bash php72 kill -USR2 1
+    ;;
+  nginx)
     _bash nginx nginx -s reload
-  else
-    docker-compose restart $container
-  fi
+    ;;
+  *)
+    _restart $@
+    ;;
+  esac
 }
 
 function _build() {
@@ -206,11 +314,11 @@ function _build() {
 }
 
 function tips() {
-  echo -e "  \033[32m$@\033[0m"
+  echo -e "\033[32m$@\033[0m"
 }
 
 function error() {
-  echo -e "  \033[1;31m$@\033[0m" 1>&2
+  echo -e "\033[1;31m$@\033[0m" 1>&2
   exit 1
 }
 
@@ -219,7 +327,8 @@ function _php() {
   local cmd
   cmd=$1
   if [[ "composer" == $cmd ]]; then
-    docker run --tty --interactive --rm --user $(id -u):$(id -g) --volume $WORK_DIR/data/composer:/tmp --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $(pwd):/app composer
+    images composer
+    docker run --tty --interactive --rm --user $(id -u):$(id -g) --volume $WORK_DIR/data/composer:/tmp --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $SOURCE_DIR:/app --workdir /app $WORK_NAME"_composer" $@
   else
     images $phpv
     _bash $phpv php $@
@@ -228,12 +337,12 @@ function _php() {
 
 function _node() {
   images node
-  docker run --tty --interactive --rm --volume $WORK_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_node" "$@"
+  docker run --tty --interactive --rm --volume $SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_node" "$@"
 }
 
 function _go() {
   images go
-  docker run --tty --interactive --rm --volume $WORK_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_go" "$@"
+  docker run --tty --interactive --rm --volume $SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_go" "$@"
 }
 
 function images() {
