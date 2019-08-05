@@ -10,7 +10,6 @@
 <body>
 <?php
 echo '<h2>程序版本信息</h2>';
-
 echo '<ul>';
 echo '<li>Nodejs版本：10.16.0</li>';
 echo '<li>Nginx版本：', $_SERVER['SERVER_SOFTWARE'], '</li>';

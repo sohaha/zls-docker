@@ -25,7 +25,7 @@
 │   ├── mongodb
 │   └── node
 ├── data                                   数据目录
-├── log                                    日志目录
+├── logs                                   日志目录
 ├── docker-compose.yml                     docker-compose 编排文件
 ├── run.sh                                 执行脚本
 └── www                                    站点目录
@@ -36,16 +36,13 @@
 
 1. 安装git、 docker 和 docker-compose
 
-docker 19以上
+docker >=19
 
-docker-compose 3
+docker-compose >= 3
 
-系统自带的 yum、apt 安装版本太老了，
+系统自带的 yum、apt 安装版本可能会过低了，
 如不清楚如果不熟悉怎么安装 docker，
 执行可以拉取项目后执行 ./run.sh installDocker 查看相关安装命令。
-
-如果不是root用户或提示权限问题，可将当前用户加入docker用户组 `sudo gpasswd -a ${USER} docker`。
-
 
 2. 拉取项目
 
@@ -62,7 +59,7 @@ git clone --depth=1 https://github.com/sohaha/zls-docker.git
 # Windows 请先复制配置再执行启动命令
 copy .env.example .env
 copy docker-compose.yml.example docker-compose.yml
-docker-compose up nginx mysql php72
+docker-compose up nginx mysql php
 ```
 
 5. 访问在浏览器中访问 http://localhost/ 。
@@ -75,14 +72,14 @@ docker-compose up nginx mysql php72
 
 ```bash
 # 编辑.env文件，
-# 从扩展列表 PHP7.2 extensions 中选择相应的扩展，
-# 添加（移除）到 PHP72_EXTENSIONS 中，英文逗号隔开
-PHP72_EXTENSIONS=swoole,redis
+# 从扩展列表 PHP extensions 中选择相应的扩展，
+# 添加（移除）到 PHP_EXTENSIONS 中，英文逗号隔开
+PHP_EXTENSIONS=swoole,redis
 
 # 重新编译 PHP 镜像并启动
-./run.sh buildUp php72
+./run.sh buildUp php
 
-# Windows 请执行 docker-compose build php72 && docker-compose up php72 -d
+# Windows 请执行 docker-compose build php && docker-compose up php -d
 ```
 
 ### 数据库密码
@@ -103,6 +100,7 @@ mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
 ### 安装脚本
 
 建议把脚本安装至系统中，方便使用
+
 ```bash
 ./run.sh tools
 # 输入1，自动安装至系统，然后就可以全局使用 zdocker
@@ -131,14 +129,14 @@ nginx，php-fpm之类的修改了配置是需要重新加载的，可使用该�
 # 不值得容器默认为nginx，下面命令等同 ./run.sh reload nginx
 ./run.sh reload
 
-./run.sh reload php72
+./run.sh reload php
 ```
 
 ### 进入容器
 
 ```bash
-# ./run.sh bash 容器名称，如ph72
-./run.sh bash php72
+# ./run.sh bash 容器名称，如ph
+./run.sh bash php
 ```
 
 ### 停止容器
@@ -148,10 +146,38 @@ nginx，php-fpm之类的修改了配置是需要重新加载的，可使用该�
 ./run.sh stop nginx
 ```
 
-### 工具箱
+### 辅助操作
 
 一些常用的操作，如 php-fpm 优化，清理没用使用的容器等等
 
 ```bash
 ./run.sh tools
 ```
+
+### 更多问题
+
+**权限问题**
+
+如果不是root用户或提示权限问题，可将当前用户加入docker用户组
+
+```bash
+sudo groupadd docker
+sudo gpasswd -a ${USER} docker
+sudo service docker restart
+```
+
+**Pull 太慢**
+
+如果是国内服务器请尝试更换docker源为国内源
+
+```bash 
+vi /etc/docker/daemon.json
+
+# {"registry-mirrors": ["https://registry.docker-cn.com"]}
+```
+
+**启动失败**
+
+查看 logs 目录，参考日志信息处理。
+
+

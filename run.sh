@@ -3,9 +3,9 @@
 # Service List: redis|mysql|mongodb|nginx|php|golang
 
 # Default Startup Service
-defaultContainer="nginx php72 mysql"
+defaultContainer="nginx php mysql"
 # Default Service
-defaultBashContainer="php72"
+defaultBashContainer="php"
 
 mydir=$0
 _b=$(ls -ld $mydir | awk '{print $NF}')
@@ -17,8 +17,8 @@ WORK_DIR=$(
   pwd
 )
 WORK_NAME=${WORK_DIR##*/}
-SOURCE_DIR=$(pwd)
-
+SCRIPT_SOURCE_DIR=$(pwd)
+WHOAMI=$(whoami)
 cd $WORK_DIR
 
 function main() {
@@ -160,6 +160,7 @@ function config() {
       tips "docker-compose.yml does not exist, initialize."
     fi
   fi
+  source $configPath
 }
 
 function _installDocker() {
@@ -189,18 +190,24 @@ function _installDocker() {
 
 function _install() {
   #askRoot
-  sudo ln -s $WORK_DIR/run.sh /usr/bin/zdocker
+  local zdocker="/usr/bin/zdocker"
+  if [ -f "$zdocker" ]; then
+    tips "old zdocker mv zdocker-old"
+    sudo mv -f $zdocker $zdocker"-old"
+  fi
+  sudo ln -s $WORK_DIR/run.sh $zdocker
   tips "You can now use zdocker instead of ./run.sh: "
   tips "  zdocker up"
   tips "  zdocker help"
 }
 
 function _tools() {
-  tips "********please enter your choise:(1-6)****"
+  tips "********please enter your choise:(1-4)****"
   cat <<EOF
   (1) Install script into system bin
-  (2) Optimize php-fpm conf
-  (3) Clean up all stopped containers
+  (2) Auto optimize php-fpm conf
+  (3) Custom composer repositories
+  (4) Clean up all stopped containers
   (0) Exit
 EOF
   read -p "Now select the top option to: " input
@@ -212,6 +219,9 @@ EOF
     optimizePHPFpm
     ;;
   3)
+    _php composer config -g repo.packagist composer $COMPOSER_PACKAGIST
+    ;;
+  4)
     docker container prune
     ;;
   0)
@@ -221,18 +231,26 @@ EOF
     echo "Please enter the correct option"
     ;;
   esac
-  #  optimize
 }
 
 function optimizePHPFpm() {
-  tips "optimize php-fpm.conf"
+  echo "optimize:"
   local mem=$(free -m | awk '/Mem:/{print $2}')
   local conf="$WORK_DIR/config/php/php-fpm.conf"
-  sed -i "s@^pm.max_children.*@pm.max_children = $(($mem / 2 / 20))@" $conf
-  sed -i "s@^pm.start_servers.*@pm.start_servers = $(($mem / 2 / 30))@" $conf
-  sed -i "s@^pm.min_spare_servers.*@pm.min_spare_servers = $(($mem / 2 / 40))@" $conf
-  sed -i "s@^pm.max_spare_servers.*@pm.max_spare_servers = $(($mem / 2 / 20))@" $conf
-  _reload php72
+  local max_children="pm.max_children = $(($mem / 2 / 20))"
+  local start_servers="pm.start_servers = $(($mem / 2 / 30))"
+  local min_spare_servers="pm.min_spare_servers = $(($mem / 2 / 40))"
+  local max_spare_servers="pm.max_spare_servers = $(($mem / 2 / 20))"
+  tips "    $max_children"
+  tips "    $start_servers"
+  tips "    $min_spare_servers"
+  tips "    $max_spare_servers"
+  sed -i "s@^pm.max_children.*@$max_children@" $conf
+  sed -i "s@^pm.start_servers.*@$start_servers@" $conf
+  sed -i "s@^pm.min_spare_servers.*@$min_spare_servers@" $conf
+  sed -i "s@^pm.max_spare_servers.*@$max_spare_servers@" $conf
+  echo "restart:"
+  _reload php
 }
 
 function _bash() {
@@ -291,8 +309,8 @@ function _reload() {
   fi
 
   case $container in
-  php72)
-    _bash php72 kill -USR2 1
+  php)
+    _bash php kill -USR2 1
     ;;
   nginx)
     _bash nginx nginx -s reload
@@ -323,26 +341,29 @@ function error() {
 }
 
 function _php() {
-  local phpv="php72"
+  local phpv="php"
   local cmd
   cmd=$1
+  images $phpv
   if [[ "composer" == $cmd ]]; then
-    images composer
-    docker run --tty --interactive --rm --user $(id -u):$(id -g) --volume $WORK_DIR/data/composer:/tmp --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $SOURCE_DIR:/app --workdir /app $WORK_NAME"_composer" $@
+    local composerPath=$(
+      cd ${COMPOSER_DATA_DIR/.\/$SCRIPT_SOURCE_DIR/}
+      pwd
+    )
+    docker run --tty --interactive --rm --user $(id -u):$(id -g) --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $composerPath:/composer --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" $@
   else
-    images $phpv
     _bash $phpv php $@
   fi
 }
 
 function _node() {
   images node
-  docker run --tty --interactive --rm --volume $SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_node" "$@"
+  docker run --tty --interactive --rm --volume $SCRIPT_SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_node" "$@"
 }
 
 function _go() {
   images go
-  docker run --tty --interactive --rm --volume $SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_go" "$@"
+  docker run --tty --interactive --rm --volume $SCRIPT_SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_go" "$@"
 }
 
 function images() {
@@ -354,6 +375,10 @@ function images() {
   elif [[ "" == $(echo $(docker-compose images) | grep $WORK_NAME"_"$container) ]]; then
     _start $container
   fi
+}
+
+function __path() {
+  echo $1
 }
 
 function _certbot() {

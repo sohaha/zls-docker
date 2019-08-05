@@ -5,6 +5,8 @@ services:
       context: ./config/node/
       args:
         NODE_IMAGES: ${NODE_IMAGES}
+    environment:
+      TZ: Asia/Shanghai
     volumes:
       - ${SOURCE_DIR}:/var/www/html/:rw
     networks:
@@ -17,6 +19,8 @@ services:
         GO_IMAGES: ${GO_IMAGES}
     volumes:
       - ${SOURCE_DIR}:/var/www/html/:rw
+    environment:
+      TZ: Asia/Shanghai
     networks:
       - default
 
@@ -35,24 +39,31 @@ services:
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
       - ${LETSENCRYPT_DATA_DIR}:/etc/nginx/letsencrypt/:rw
     restart: always
+    environment:
+      TZ: Asia/Shanghai
     networks:
       - default
 
-  php72:
+  php:
     build:
       context: ./config/php/
       args:
-        PHP_VERSION: ${PHP72_VERSION}
-        PHP_IMAGES: ${PHP72_IMAGES}
+        PHP_VERSION: ${PHP_VERSION}
+        PHP_IMAGES: ${PHP_IMAGES}
         ALPINE_REPOSITORIES: ${ALPINE_REPOSITORIES}
-        PHP_EXTENSIONS: ${PHP72_EXTENSIONS}
-        MORE_EXTENSION_INSTALLER: php72.sh
+        PHP_EXTENSIONS: ${PHP_EXTENSIONS}
+        COMPOSER_VERSION: ${COMPOSER_VERSION}
+        COMPOSER_PACKAGIST: ${COMPOSER_PACKAGIST}
+        MORE_EXTENSION_INSTALLER: php.sh
     volumes:
       - ${SOURCE_DIR}:/var/www/html/:rw
-      - ${PHP72_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
-      - ${PHP72_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
-      - ${PHP72_LOG_DIR}:/var/log/php
+      - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
+      - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
+      - ${PHP_LOG_DIR}:/var/log/php
+      - ${COMPOSER_DATA_DIR}:/composer:rw
     restart: always
+    environment:
+      TZ: Asia/Shanghai
     cap_add:
       - SYS_PTRACE
     networks:
@@ -73,6 +84,7 @@ services:
       - default
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      TZ: Asia/Shanghai
 
   redis:
     build:
@@ -84,6 +96,8 @@ services:
     volumes:
       - ${REDIS_CONF_FILE}:/etc/redis.conf:ro
     restart: always
+    environment:
+      TZ: Asia/Shanghai
     entrypoint: ["redis-server", "/etc/redis.conf"]
     networks:
       - default
@@ -94,16 +108,15 @@ services:
       args:
         MONGODB_IMAGES: ${MONGODB_IMAGES}
     environment:
-        MONGO_INITDB_ROOT_USERNAME: "${MONGODB_INITDB_ROOT_USERNAME}"
-        MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_INITDB_ROOT_PASSWORD}"
+      MONGO_INITDB_ROOT_USERNAME: "${MONGODB_INITDB_ROOT_USERNAME}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_INITDB_ROOT_PASSWORD}"
+      TZ: Asia/Shanghai
     volumes:
       - ${MONGODB_DATA_DIR}:/data/db:rw
       - ${MONGODB_DATA_DIR}/mongo_key:/mongo:rw
     ports:
-       - "${MONGODB_HOST_PORT}:27017"
+      - "${MONGODB_HOST_PORT}:27017"
     networks:
-       - default
+      - default
     command:
-       --auth
-
-
+      --auth
