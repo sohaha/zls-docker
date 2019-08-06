@@ -220,6 +220,7 @@ EOF
     ;;
   3)
     _php composer config -g repo.packagist composer $COMPOSER_PACKAGIST
+    _php composer global require hirak/prestissimo
     ;;
   4)
     docker container prune
@@ -350,7 +351,9 @@ function _php() {
       cd ${COMPOSER_DATA_DIR/.\/$SCRIPT_SOURCE_DIR/}
       pwd
     )
-    docker run --tty --interactive --rm --user $(id -u):$(id -g) --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $composerPath:/composer --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" $@
+    docker run --tty --interactive --rm --cap-add SYS_PTRACE --volume $composerPath:/composer:rw --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" $@
+
+    #docker run --tty --interactive --rm --user $(id -u):$(id -g) --cap-add SYS_PTRACE --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $composerPath:/composer:rw --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" $@
   else
     _bash $phpv php $@
   fi
