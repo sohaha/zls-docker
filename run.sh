@@ -208,6 +208,7 @@ function _tools() {
   (2) Auto optimize php-fpm conf
   (3) Custom composer repositories
   (4) Clean up all stopped containers
+  (5) Mysql export and import
   (0) Exit
 EOF
   read -p "Now select the top option to: " input
@@ -224,6 +225,9 @@ EOF
     ;;
   4)
     docker container prune
+    ;;
+  5)
+    _mysqlTools
     ;;
   0)
     exit 1
@@ -398,6 +402,55 @@ function _certbot() {
     --volume "$vhostDir:/var/www/html" \
     --volume "$WORK_DIR/log:/var/log" \
     certbot/certbot certonly -n --no-eff-email --email admin@73zls.com --agree-tos --webroot -w /var/www/html -d $domain
+}
+
+function _mysqlTools() {
+  local yes=0
+  tips "********Mysql Tools****"
+  cat <<EOF
+  (1) Export
+  (2) Import
+  (0) Exit
+EOF
+  read -p "Now select the top option to: " input
+  case $input in
+  1)
+    __determine "Mysql Export"
+    yes=$?
+    if [[ $yes == 1 ]]; then
+      local BAK_FILE="$MYSQL_CONF_DIR/backup.sql"
+      _bash mysql mysqldump --all-databases -uroot -p666666 >$BAK_FILE
+      echo "export -> $BAK_FILE"
+    else
+      echo "Give up Export mysql"
+    fi
+    ;;
+  2)
+    tips 'command:'
+    echo "        ${BASH_SOURCE[0]} bash mysql"
+    echo "        mysql -uroot -p$MYSQL_ROOT_PASSWORD"
+    echo "        source /mysql/backup.sql"
+    ;;
+  0)
+    exit 1
+    ;;
+  *)
+    echo "Please enter the correct option"
+    ;;
+  esac
+}
+
+function __determine() {
+  echo -e "Please determine if you want to perform \033[32m$1\033[0m operation (yes|NO)"
+  read -p "Now select the top option to: " input
+  case $input in
+  "y" | "Y" | "yes" | "YES")
+    return 1
+    ;;
+  *)
+    return 0
+    ;;
+  esac
 }
 
 main "$@"

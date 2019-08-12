@@ -79,6 +79,7 @@ services:
     volumes:
       - ${MYSQL_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:ro
       - ${MYSQL_DATA_DIR}:/var/lib/mysql/:rw
+      - ${MYSQL_CONF_DIR}:/mysql/:rw
     restart: always
     networks:
       - default
