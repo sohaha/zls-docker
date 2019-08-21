@@ -26,7 +26,7 @@ function main() {
   config
   judge
   cmd=$1
-  if [[ "" != $1 ]] && [[ "help" != $1 ]] && [[ "node" != $1 ]] && [[ "npm" != $1 ]] && [[ "go" != $1 ]] && [[ "composer" != $1 ]]; then
+  if [[ "" != $1 ]] && [[ "help" != $1 ]] && [[ "node" != $1 ]] && [[ "npm" != $1 ]] && [[ "sentry" != $1 ]] && [[ "go" != $1 ]] && [[ "composer" != $1 ]]; then
     shift
   fi
   case "$cmd" in
@@ -64,11 +64,17 @@ function main() {
   go)
     _go $@
     ;;
+  sentry)
+    _sentry $@
+    ;;
   stats)
     docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"
     ;;
   certbot)
     _certbot $@
+    ;;
+  ins)
+    _inspect $@
     ;;
   stop_all | stopAll | stopall)
     docker ps -a -q
@@ -202,13 +208,14 @@ function _install() {
 }
 
 function _tools() {
-  tips "********please enter your choise:(1-4)****"
+  tips "********please enter your choise:(1-6)****"
   cat <<EOF
   (1) Install script into system bin
   (2) Auto optimize php-fpm conf
   (3) Custom composer repositories
   (4) Clean up all stopped containers
   (5) Mysql export and import
+  (6) Start Sentry Error Tracking Software
   (0) Exit
 EOF
   read -p "Now select the top option to: " input
@@ -228,6 +235,9 @@ EOF
     ;;
   5)
     _mysqlTools
+    ;;
+  6)
+    __sentry
     ;;
   0)
     exit 1
@@ -363,6 +373,11 @@ function _php() {
   fi
 }
 
+function _sentry() {
+  images sentry
+  _bash sentry "$@"
+}
+
 function _node() {
   images node
   docker run --tty --interactive --rm --volume $SCRIPT_SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_node" "$@"
@@ -451,6 +466,19 @@ function __determine() {
     return 0
     ;;
   esac
+}
+
+function _inspect() {
+    docker inspect $WORK_NAME"_$@"
+}
+
+function __sentry() {
+  local cmd=${BASH_SOURCE[0]}
+  cmd=$(echo $cmd | sed 's:\/usr\/bin\/::g')
+  docker-compose up -d sentry sentry_celery_beat sentry_celery_worker
+  tips "For the first time, please execute the following command to initialize sentry:\n"
+  tips "  $cmd sentry upgrade"
+  tips ""
 }
 
 main "$@"

@@ -1,4 +1,5 @@
 version: "3"
+
 services:
   node:
     build:
@@ -121,3 +122,78 @@ services:
       - default
     command:
       --auth
+
+  sentry:
+    image: ${SENTRY_IMAGES}
+    depends_on:
+     - redis
+     - postgres
+    ports:
+     - ${SENTRY_PORT}:9000
+    environment:
+      SENTRY_SECRET_KEY: "${SENTRY_SECRET_KEY}"
+      SENTRY_REDIS_HOST: "redis"
+      SENTRY_POSTGRES_HOST: "postgres"
+      SENTRY_DB_USER: "${POSTGRES_USER}"
+      SENTRY_DB_PASSWORD: "${POSTGRES_PASSWORD}"
+      TZ: Asia/Shanghai
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - default
+
+  sentry_celery_beat:
+    image: ${SENTRY_IMAGES}
+    depends_on:
+     - redis
+     - postgres
+    command: "sentry run cron"
+    environment:
+      SENTRY_SECRET_KEY: "${SENTRY_SECRET_KEY}"
+      SENTRY_REDIS_HOST: "redis"
+      SENTRY_POSTGRES_HOST: "postgres"
+      SENTRY_DB_USER: "${POSTGRES_USER}"
+      SENTRY_DB_PASSWORD: "${POSTGRES_PASSWORD}"
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - default
+
+  sentry_celery_worker:
+    image: ${SENTRY_IMAGES}
+    depends_on:
+     - redis
+     - postgres
+    links:
+     - redis
+     - postgres
+    command: "sentry run worker"
+    environment:
+      SENTRY_SECRET_KEY: "${SENTRY_SECRET_KEY}"
+      SENTRY_REDIS_HOST: "redis"
+      SENTRY_POSTGRES_HOST: "postgres"
+      SENTRY_DB_USER: "${POSTGRES_USER}"
+      SENTRY_DB_PASSWORD: "${POSTGRES_PASSWORD}"
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - default
+
+  postgres:
+    build:
+      context: ./config/postgres
+      args:
+        POSTGRES_IMAGES: ${POSTGRES_IMAGES}
+    ports:
+       - "${POSTGRES_PORT}:5432"
+    volumes:
+       - ${POSTGRES_DATA_DIR}:/var/lib/postgresql/data:rw
+    restart: always
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      #PGDATA: /tmp
+      TZ: Asia/Shanghai
+    networks:
+      - default
