@@ -91,6 +91,9 @@ function main() {
   help)
     _help $@
     ;;
+  logs)
+    _logs $@
+    ;;
   *)
     _help $@
     ;;
@@ -208,14 +211,15 @@ function _install() {
 }
 
 function _tools() {
-  tips "********please enter your choise:(1-6)****"
+  tips "********please enter your choise:(1-7)****"
   cat <<EOF
   (1) Install script into system bin
   (2) Auto optimize php-fpm conf
   (3) Custom composer repositories
   (4) Clean up all stopped containers
   (5) Mysql export and import
-  (6) Start Sentry Error Tracking Software
+  (6) Start Sentry - Error Tracking Software
+  (7) Start Yapi - api management platform
   (0) Exit
 EOF
   read -p "Now select the top option to: " input
@@ -238,6 +242,9 @@ EOF
     ;;
   6)
     __sentry
+    ;;
+  7)
+    __yapi
     ;;
   0)
     exit 1
@@ -389,8 +396,7 @@ function _go() {
 }
 
 function images() {
-  local container
-  container=$1
+  local container=$1
   if [[ "" == $(echo $(docker images) | grep $WORK_NAME"_"$container) ]]; then
     tips "The $container service is for the first time, please wait ..."
     _start --build $container
@@ -401,6 +407,11 @@ function images() {
 
 function __path() {
   echo $1
+}
+
+function _logs() {
+  local container=$1
+  docker-compose $container
 }
 
 function _certbot() {
@@ -469,7 +480,12 @@ function __determine() {
 }
 
 function _inspect() {
-    docker inspect $WORK_NAME"_$@"
+  docker inspect $WORK_NAME"_$@"
+}
+
+function __yapi() {
+  docker-compose up -d yapi
+  tips "yapi: http://127.0.0.1:$YAPI_HOST_PORT"
 }
 
 function __sentry() {

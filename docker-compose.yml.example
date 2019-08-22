@@ -1,6 +1,8 @@
 version: "3"
 
 services:
+
+### node ##########
   node:
     build:
       context: ./config/node/
@@ -13,6 +15,7 @@ services:
     networks:
       - default
 
+### go ##########
   go:
     build:
       context: ./config/golang/
@@ -25,6 +28,7 @@ services:
     networks:
       - default
 
+### nginx ##########
   nginx:
     build:
       context: ./config/nginx/
@@ -40,11 +44,14 @@ services:
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
       - ${LETSENCRYPT_DATA_DIR}:/etc/nginx/letsencrypt/:rw
     restart: always
+    depends_on:
+     - php
     environment:
       TZ: Asia/Shanghai
     networks:
       - default
 
+### php ##########
   php:
     build:
       context: ./config/php/
@@ -70,6 +77,7 @@ services:
     networks:
       - default
 
+### mysql ##########
   mysql:
     build:
       context: ./config/mysql/
@@ -88,6 +96,7 @@ services:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       TZ: Asia/Shanghai
 
+### redis ##########
   redis:
     build:
       context: ./config/redis/
@@ -104,6 +113,7 @@ services:
     networks:
       - default
 
+### mongodb ##########
   mongodb:
     build:
       context: ./config/mongodb/
@@ -123,6 +133,7 @@ services:
     command:
       --auth
 
+### sentry ##########
   sentry:
     image: ${SENTRY_IMAGES}
     depends_on:
@@ -179,6 +190,7 @@ services:
     networks:
       - default
 
+### postgres ##########
   postgres:
     build:
       context: ./config/postgres
@@ -195,5 +207,44 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       #PGDATA: /tmp
       TZ: Asia/Shanghai
+    networks:
+      - default
+
+### portainer ##########
+  portainer:
+    image: ${PORTAINER_IMAGES}
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - "${PORTAINER_HOST_PORT}:9000"
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PORTAINER_DATA_DIR}:/data
+
+### yapi ##########
+  yapi:
+    build:
+      context: ./config/yapi/
+      args:
+          YAPI_VERSION: ${YAPI_VERSION}
+          YAPI_HOME: ${YAPI_HOME}
+          YAPI_HOST_PORT: ${YAPI_HOST_PORT}
+          NODE_IMAGES: ${NODE_IMAGES}
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "${YAPI_HOST_PORT}:${YAPI_HOST_PORT}"
+      #- "9090:9090"
+    volumes:
+      - ${YAPI_CONFIG_FILE}:/home/vendors/config.json:rw
+      - ${YAPI_CONFIG_FILE}:/home/config.json:rw
+      - ${YAPI_LOG_DIR}:/home/log
+    depends_on:
+      - mongodb
+    cap_add:
+      - SYS_PTRACE
     networks:
       - default

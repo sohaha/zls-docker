@@ -99,7 +99,7 @@ mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
 
 ### 安装脚本
 
-建议把脚本安装至系统中，方便使用
+建议把脚本命令安装至系统中，方便使用
 
 ```bash
 ./run.sh tools
@@ -181,3 +181,24 @@ vi /etc/docker/daemon.json
 查看 logs 目录，参考日志信息处理。
 
 
+
+
+**安装YAPI**
+
+```bash
+# 先启动 mongodb
+./run.sh up mongodb
+
+# 进入 mogodb 内 建立 Yapi 账号
+./run.sh bash mongodb
+# 进入 mongo 数据库
+mongo -u root -p 666666
+# 进入 Yapi 库
+use yapi
+# 添加一个用户 然后 Ctrl+c退出数据库 exit 退出容器
+db.createUser({user: "yapi",pwd: "666666",roles: [{role: "dbOwner",db: "yapi"}]})
+# 默认账号密码 admin@admin.com ymfe.org
+# 启动 yapi (上面步骤只要执行一次)
+./run.sh up yapi
+
+```
