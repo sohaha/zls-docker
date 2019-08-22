@@ -236,7 +236,7 @@ services:
     environment:
       TZ: Asia/Shanghai
     ports:
-      - "${YAPI_HOST_PORT}:${YAPI_HOST_PORT}"
+      - "${YAPI_HOST_PORT}:8005"
       #- "9090:9090"
     volumes:
       - ${YAPI_CONFIG_FILE}:/home/vendors/config.json:rw
