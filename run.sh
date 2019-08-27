@@ -174,6 +174,7 @@ function config() {
 
 function _installDocker() {
   #askRoot
+  
   local info=$(cat /etc/os-release)
   if [[ "" != $(echo $info | grep CentOS) ]]; then
     tips 'OS is CentOS'
