@@ -367,16 +367,17 @@ function _php() {
   local cmd
   cmd=$1
   images $phpv
+  local composerPath=$(
+    cd ${COMPOSER_DATA_DIR/.\/$SCRIPT_SOURCE_DIR/}
+    pwd
+  )
   if [[ "composer" == $cmd ]]; then
-    local composerPath=$(
-      cd ${COMPOSER_DATA_DIR/.\/$SCRIPT_SOURCE_DIR/}
-      pwd
-    )
     docker run --tty --interactive --rm --cap-add SYS_PTRACE --volume $composerPath:/composer:rw --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" $@
 
     #docker run --tty --interactive --rm --user $(id -u):$(id -g) --cap-add SYS_PTRACE --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $composerPath:/composer:rw --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" $@
   else
-    _bash $phpv php $@
+  #   _bash $phpv php $@
+    docker run --tty --interactive --rm --cap-add SYS_PTRACE --volume $composerPath:/composer:rw --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" php $@
   fi
 }
 
