@@ -140,6 +140,7 @@ function _help() {
   tips " $cmd build        Build services"
   tips " $cmd buildUp      Build and start services"
   tips " $cmd tools        Toolbox"
+  tips " $cmd ssl          Renew the free certificates from Let's Encrypt."
   echo ''
   echo " Designated Language Directives(php, node, npm, golang, composer)"
   echo " $cmd php -v"
@@ -504,9 +505,11 @@ function _certbot() {
 
   $ACME --issue $dns $alias_str -d $domain $broad $webroot
 
-  tips "install cert:"
-  echo "  mkdir -p $certsPath/config/nginx/conf.d/certs/[DOMAIN]"
-  echo "  $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/[DOMAIN]/server.key --fullchain-file $certsPath/config/nginx/conf.d/certs/[DOMAIN]/server.crt"
+  mkdir -p $certsPath/config/nginx/conf.d/certs/$domain
+  $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/$domain/server.key --fullchain-file $certsPath/config/nginx/conf.d/certs/$domain/server.crt
+
+  tips "reference:"
+  echo "  cp $certsPath/config/nginx/conf.d/localhost_https.conf $certsPath/config/nginx/conf.d/[DOMAIN]_https.conf"
 }
 
 function _mysqlTools() {
