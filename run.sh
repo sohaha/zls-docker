@@ -7,6 +7,25 @@ defaultContainer="nginx php mysql"
 # Default Service
 defaultBashContainer="php"
 
+# # GitHub host
+# 192.30.253.112 github.com
+# 192.30.253.118 gist.github.com
+# 151.101.112.133 assets-cdn.github.com
+# 151.101.184.133 raw.githubusercontent.com
+# 151.101.112.133 gist.githubusercontent.com
+# 151.101.184.133 cloud.githubusercontent.com
+# 151.101.112.133 camo.githubusercontent.com
+# 151.101.112.133 avatars0.githubusercontent.com
+# 151.101.112.133 avatars1.githubusercontent.com
+# 151.101.184.133 avatars2.githubusercontent.com
+# 151.101.12.133 avatars3.githubusercontent.com
+# 151.101.12.133 avatars4.githubusercontent.com
+# 151.101.184.133 avatars5.githubusercontent.com
+# 151.101.184.133 avatars6.githubusercontent.com
+# 151.101.184.133 avatars7.githubusercontent.com
+# 151.101.12.133 avatars8.githubusercontent.com
+# # GitHub End
+
 mydir=$0
 _b=$(ls -ld $mydir | awk '{print $NF}')
 _c=$(ls -ld $mydir | awk '{print $(NF-2)}')
@@ -425,8 +444,12 @@ function _logs() {
 function _certbot() {
   local certsPath="$WORK_DIR"
   local ACME=~/.acme.sh/acme.sh
+  local binCmd=$certsPath/.run.sh
   local zdc="/usr/bin/zdc"
-  local help="Usage: ./ssl.sh -d mydomain.com -w $certsPath/www/html/mydomain.com/"
+  if [ -f "$zdc" ]; then
+    binCmd=zdc
+  fi
+  local help="Usage: $binCmd -d mydomain.com -w $certsPath/www/html/mydomain.com/"
   local email
   local debug
   local force
