@@ -42,7 +42,6 @@ services:
       - ${NGINX_LOG_DIR}:/var/log/nginx/:rw
       - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
-      - ${LETSENCRYPT_DATA_DIR}:/etc/nginx/letsencrypt/:rw
     restart: always
     depends_on:
      - php

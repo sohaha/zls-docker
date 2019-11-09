@@ -70,7 +70,7 @@ function main() {
   stats)
     docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"
     ;;
-  certbot)
+  ssl)
     _certbot $@
     ;;
   ins)
@@ -200,15 +200,21 @@ function _installDocker() {
 
 function _install() {
   #askRoot
+  local zdc="/usr/bin/zdc"
   local zdocker="/usr/bin/zdocker"
   if [ -f "$zdocker" ]; then
-    tips "old zdocker mv zdocker-old"
     sudo mv -f $zdocker $zdocker"-old"
   fi
+
+  if [ -f "$zdc" ]; then
+    tips "old zdc mv zdc-old"
+    sudo mv -f $zdc $zdc"-old"
+  fi
   sudo ln -s $WORK_DIR/run.sh $zdocker
-  tips "You can now use zdocker instead of ./run.sh: "
-  tips "  zdocker up"
-  tips "  zdocker help"
+  sudo ln -s $WORK_DIR/run.sh $zdc
+  tips "You can now use zdc instead of ./run.sh: "
+  tips "  zdc up"
+  tips "  zdc help"
 }
 
 function _tools() {
@@ -417,19 +423,65 @@ function _logs() {
 }
 
 function _certbot() {
-  local domain
-  local vhostDir
-  local certsPath="$WORK_DIR/data/letsencrypt"
-  domain=$1
-  if [[ "" == $domain ]]; then
-    error "Please enter the domain name"
+  local certsPath="$WORK_DIR"
+  local ACME=~/.acme.sh/acme.sh
+  local zdc="/usr/bin/zdc"
+  local help="Usage: ./ssl.sh -d mydomain.com -w /var/www/html/mydomain.com/"
+  local email
+  local debug
+  local force
+  if [ ! -f "$ACME" ]; then
+    echo -e "\e[31m$ACME does not exist, installing...\e[0m"
+    curl https://get.acme.sh | sh
+    # 自动更新
+    $ACME --upgrade  --auto-upgrade
   fi
-  vhostDir="$WORK_DIR/www/$domain"
-  docker run -it --rm --name certbot \
-    --volume "$certsPath:/etc/letsencrypt/live/archive" \
-    --volume "$vhostDir:/var/www/html" \
-    --volume "$WORK_DIR/log:/var/log" \
-    certbot/certbot certonly -n --no-eff-email --email admin@73zls.com --agree-tos --webroot -w /var/www/html -d $domain
+
+  if [[ "$1" == "" ]]; then
+    error $help
+  fi
+
+  args=()
+
+  while [ "$1" != "" ]; do
+      case "$1" in
+          --email )                       email="$2";                     shift;;
+          --dns )                         dns="$2";                       shift;;
+          -d | --domain )                 domain="$2";                    shift;;
+          -B | --broad )                  broad="general analysis";       shift;;
+          -a | --alias )                  alias="$2";                     shift;;
+          -w | --webroot )                webroot="--webroot $2";         shift;;
+          -h | --help )                   tips $help;                     exit;;
+          * )                             args+=("$1")
+      esac
+      shift
+  done
+  if [[ -z "${domain}" ]]; then
+      error "Please enter the domain name"
+  fi
+
+  if [[ -z "${reloadcmd}" ]]; then
+     reloadcmd='zdc reload'
+  fi
+
+  if [[ -n "${dns}" ]]; then
+      # dns_cf
+      dns="--dns  ${dns}";
+  fi
+
+  if [[ -n "${broad}" ]]; then
+      broad="-d  *.${domain}";
+  fi
+
+  if [[ -n "${alias}" ]]; then
+      alias_str="--challenge-alias ${alias}";
+  fi
+
+  ## --force --debug --reloadcmd "zdc reload"
+
+#  $ACME --issue $dns $alias_str -d $domain $broad $webroot
+  tips "Please execute:"
+  echo "  $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/[DOMAIN]/server.key --fullchain-file /config/nginx/conf.d/certs/[DOMAIN]/server.crt"
 }
 
 function _mysqlTools() {
