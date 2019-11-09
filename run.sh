@@ -505,7 +505,9 @@ function _certbot() {
 
   $ACME --issue $dns $alias_str -d $domain $broad $webroot
 
+  echo "create certs dir: $certsPath/config/nginx/conf.d/certs/$domain"
   mkdir -p $certsPath/config/nginx/conf.d/certs/$domain
+
   $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/$domain/server.key --fullchain-file $certsPath/config/nginx/conf.d/certs/$domain/server.crt
 
   tips "reference:"
