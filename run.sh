@@ -426,7 +426,7 @@ function _certbot() {
   local certsPath="$WORK_DIR"
   local ACME=~/.acme.sh/acme.sh
   local zdc="/usr/bin/zdc"
-  local help="Usage: ./ssl.sh -d mydomain.com -w /var/www/html/mydomain.com/"
+  local help="Usage: ./ssl.sh -d mydomain.com -w $certsPath/www/html/mydomain.com/"
   local email
   local debug
   local force
@@ -479,7 +479,8 @@ function _certbot() {
 
   ## --force --debug --reloadcmd "zdc reload"
 
-#  $ACME --issue $dns $alias_str -d $domain $broad $webroot
+  $ACME --issue $dns $alias_str -d $domain $broad $webroot
+
   tips "Please execute:"
   echo "  $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/[DOMAIN]/server.key --fullchain-file /config/nginx/conf.d/certs/[DOMAIN]/server.crt"
 }
