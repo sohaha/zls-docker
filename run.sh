@@ -505,7 +505,8 @@ function _certbot() {
   $ACME --issue $dns $alias_str -d $domain $broad $webroot
 
   tips "install cert:"
-  echo "  $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/[DOMAIN]/server.key --fullchain-file /config/nginx/conf.d/certs/[DOMAIN]/server.crt"
+  echo "  mkdir -p $certsPath/config/nginx/conf.d/certs/[DOMAIN]"
+  echo "  $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/[DOMAIN]/server.key --fullchain-file $certsPath/config/nginx/conf.d/certs/[DOMAIN]/server.crt"
 }
 
 function _mysqlTools() {
