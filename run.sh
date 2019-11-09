@@ -449,7 +449,7 @@ function _certbot() {
   if [ -f "$zdc" ]; then
     binCmd=zdc
   fi
-  local help="Usage: $binCmd -d mydomain.com -w $certsPath/www/html/mydomain.com/"
+  local help="Usage: $binCmd ssl -d mydomain.com -w $certsPath/www/html/mydomain.com/"
   local email
   local debug
   local force
