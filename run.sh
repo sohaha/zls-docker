@@ -449,7 +449,7 @@ function _certbot() {
   if [ -f "$zdc" ]; then
     binCmd=zdc
   fi
-  local help="Usage: $binCmd ssl -d mydomain.com -w $certsPath/www/html/mydomain.com/"
+  local help="Usage: $binCmd ssl -d mydomain.com -w $certsPath/www/mydomain.com/public"
   local email
   local debug
   local force
@@ -504,7 +504,7 @@ function _certbot() {
 
   $ACME --issue $dns $alias_str -d $domain $broad $webroot
 
-  tips "Please execute:"
+  tips "install cert:"
   echo "  $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/[DOMAIN]/server.key --fullchain-file /config/nginx/conf.d/certs/[DOMAIN]/server.crt"
 }
 
