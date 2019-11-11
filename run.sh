@@ -473,6 +473,7 @@ function _certbot() {
           --dns )                         dns="$2";                       shift;;
           -d | --domain )                 domain="$2";                    shift;;
           -B | --broad )                  broad="general analysis";       shift;;
+          -B | --broad )                  broad="general analysis";       shift;;
           -a | --alias )                  alias="$2";                     shift;;
           -w | --webroot )                webroot="--webroot $2";         shift;;
           -h | --help )                   tips $help;                     exit;;
@@ -488,7 +489,7 @@ function _certbot() {
      reloadcmd='zdc reload'
   fi
 
-  if [[ -z ${webroot} || -n "${dns}" ]]; then
+  if [[ -z ${webroot} && -n "${dns}" ]]; then
       # dns_cf
       dns="--dns ${dns}";
   fi
@@ -502,8 +503,8 @@ function _certbot() {
   fi
 
   ## --force --debug --reloadcmd "zdc reload"
-
-  $ACME --issue $dns $alias_str -d $domain $broad $webroot
+  
+  $ACME --issue $dns $alias_str -d $domain $broad $webroot $args
 
   if [ $? -ne 0 ]; then
     exit
