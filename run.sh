@@ -488,9 +488,9 @@ function _certbot() {
      reloadcmd='zdc reload'
   fi
 
-  if [[ -n "${dns}" ]]; then
+  if [[ -z ${webroot} || -n "${dns}" ]]; then
       # dns_cf
-      dns="--dns  ${dns}";
+      dns="--dns ${dns}";
   fi
 
   if [[ -n "${broad}" ]]; then
@@ -504,6 +504,10 @@ function _certbot() {
   ## --force --debug --reloadcmd "zdc reload"
 
   $ACME --issue $dns $alias_str -d $domain $broad $webroot
+
+  if [ $? -ne 0 ]; then
+    exit
+  fi
 
   echo "create certs dir: $certsPath/config/nginx/conf.d/certs/$domain"
   mkdir -p $certsPath/config/nginx/conf.d/certs/$domain
