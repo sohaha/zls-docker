@@ -1,7 +1,13 @@
 version: "3"
 
-services:
+networks:
+  defNetworks:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.0.0.0/24
 
+services:
 ### node ##########
   node:
     build:
@@ -13,7 +19,7 @@ services:
     volumes:
       - ${SOURCE_DIR}:/var/www/html/:rw
     networks:
-      - default
+      - defNetworks
 
 ### go ##########
   go:
@@ -26,7 +32,7 @@ services:
     environment:
       TZ: Asia/Shanghai
     networks:
-      - default
+      - defNetworks
 
 ### nginx ##########
   nginx:
@@ -48,7 +54,8 @@ services:
     environment:
       TZ: Asia/Shanghai
     networks:
-      - default
+      defNetworks:
+        ipv4_address: 172.0.0.10
 
 ### php ##########
   php:
@@ -74,7 +81,10 @@ services:
     cap_add:
       - SYS_PTRACE
     networks:
-      - default
+      defNetworks:
+        ipv4_address: 172.0.0.20
+    extra_hosts:
+      - "nginx.docker:172.0.0.10"
 
 ### mysql ##########
   mysql:
@@ -90,7 +100,7 @@ services:
       - ${MYSQL_CONF_DIR}:/mysql/:rw
     restart: always
     networks:
-      - default
+      - defNetworks
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       TZ: Asia/Shanghai
@@ -110,7 +120,7 @@ services:
       TZ: Asia/Shanghai
     entrypoint: ["redis-server", "/etc/redis.conf"]
     networks:
-      - default
+      - defNetworks
 
 ### mongodb ##########
   mongodb:
@@ -128,7 +138,7 @@ services:
     ports:
       - "${MONGODB_HOST_PORT}:27017"
     networks:
-      - default
+      - defNetworks
     command:
       --auth
 
@@ -150,7 +160,7 @@ services:
     cap_add:
       - SYS_PTRACE
     networks:
-      - default
+      - defNetworks
 
   sentry_celery_beat:
     image: ${SENTRY_IMAGES}
@@ -167,7 +177,7 @@ services:
     cap_add:
       - SYS_PTRACE
     networks:
-      - default
+      - defNetworks
 
   sentry_celery_worker:
     image: ${SENTRY_IMAGES}
@@ -187,7 +197,7 @@ services:
     cap_add:
       - SYS_PTRACE
     networks:
-      - default
+      - defNetworks
 
 ### postgres ##########
   postgres:
@@ -207,7 +217,7 @@ services:
       #PGDATA: /tmp
       TZ: Asia/Shanghai
     networks:
-      - default
+      - defNetworks
 
 ### portainer ##########
   portainer:
@@ -246,4 +256,4 @@ services:
     cap_add:
       - SYS_PTRACE
     networks:
-      - default
+      - defNetworks
