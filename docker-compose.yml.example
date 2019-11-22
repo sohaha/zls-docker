@@ -100,7 +100,8 @@ services:
       - ${MYSQL_CONF_DIR}:/mysql/:rw
     restart: always
     networks:
-      - defNetworks
+      defNetworks:
+        ipv4_address: 172.0.0.30
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       TZ: Asia/Shanghai
