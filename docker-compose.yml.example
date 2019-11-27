@@ -82,7 +82,7 @@ services:
       - SYS_PTRACE
     networks:
       defNetworks:
-        ipv4_address: 172.0.0.20
+        ipv4_address: 172.0.0.30
     extra_hosts:
       - "nginx.docker:172.0.0.10"
 
@@ -101,7 +101,7 @@ services:
     restart: always
     networks:
       defNetworks:
-        ipv4_address: 172.0.0.30
+        ipv4_address: 172.0.0.20
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       TZ: Asia/Shanghai
