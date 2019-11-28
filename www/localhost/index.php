@@ -9,6 +9,7 @@
 </head>
 <body>
 <?php
+echo '<h3><a href="/tools/adminer.php">数据库管理</a></h3>';
 echo '<h2>程序版本信息</h2>';
 echo '<ul>';
 echo '<li>Nodejs版本：10.16.0</li>';
