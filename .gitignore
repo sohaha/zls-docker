@@ -2,8 +2,7 @@
 .env
 .idea/
 .vscode/
-www/*
 !www/localhost/
-/docker-compose.yml
-/data/composer/*
-www
+docker-compose.yml
+data/composer/*
+www/
