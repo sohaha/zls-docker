@@ -82,7 +82,9 @@ PHP_EXTENSIONS=swoole,redis
 # Windows 请执行 docker-compose build php && docker-compose up php -d
 ```
 
-### 数据库密码
+### 数据库
+
+在其它容器需要连接数据库 HOST: mysql 即可(或172.0.0.20)。
 
 如需修改默认密码，编辑.env文件即可，
 
