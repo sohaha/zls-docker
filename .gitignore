@@ -6,3 +6,4 @@ www/*
 !www/localhost/
 /docker-compose.yml
 /data/composer/*
+www
