@@ -17,6 +17,6 @@ if %c% == node (docker run --tty --interactive --rm --cap-add SYS_PTRACE %volume
 
 if %c% == npm (docker run --tty --interactive --rm --cap-add SYS_PTRACE %volume% --workdir /var/www/html "%_dockerDir%_node" %a%) 
 
-if %c% == "" (docker-compose up -d nginx) 
+if %c% == up (docker-compose up -d nginx) 
 
 cd /d %mycd%
