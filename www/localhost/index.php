@@ -54,6 +54,7 @@ function getRedisVersion()
         try {
             $redis = new Redis();
             $redis->connect('redis', 6379);
+            /** @var array $info */
             $info = $redis->info();
             return $info['redis_version'];
         } catch (Exception $e) {

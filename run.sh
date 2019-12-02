@@ -38,6 +38,7 @@ WORK_DIR=$(
 WORK_NAME=${WORK_DIR##*/}
 SCRIPT_SOURCE_DIR=$(pwd)
 WHOAMI=$(whoami)
+TIME=$(date "+%Y-%m-%d %H:%M:%S")
 cd $WORK_DIR
 
 function main() {
@@ -104,6 +105,9 @@ function main() {
   tools)
     _tools
     ;;
+  mysql)
+    _mysqlTools
+    ;;
   installDocker | installdocker)
     _installDocker
     ;;
@@ -140,6 +144,7 @@ function _help() {
   tips " $cmd build        Build services"
   tips " $cmd buildUp      Build and start services"
   tips " $cmd tools        Toolbox"
+  tips " $cmd mysql        Mysql operating"
   tips " $cmd ssl          Renew the free certificates from Let's Encrypt."
   echo ''
   echo " Designated Language Directives(php, node, npm, golang, composer)"
@@ -244,9 +249,8 @@ function _tools() {
   (2) Auto optimize php-fpm conf
   (3) Custom composer repositories
   (4) Clean up all stopped containers
-  (5) Mysql export and import
-  (6) Start Sentry - Error Tracking Software
-  (7) Start Yapi - api management platform
+  (5) Start Sentry - Error Tracking Software
+  (6) Start Yapi - api management platform
   (0) Exit
 EOF
   read -p "Now select the top option to: " input
@@ -265,12 +269,9 @@ EOF
     docker container prune
     ;;
   5)
-    _mysqlTools
-    ;;
-  6)
     __sentry
     ;;
-  7)
+  6)
     __yapi
     ;;
   0)
@@ -503,7 +504,7 @@ function _certbot() {
   fi
 
   ## --force --debug --reloadcmd "zdc reload"
-  
+
   $ACME --issue $dns $alias_str -d $domain $broad $webroot $args
 
   if [ $? -ne 0 ]; then
@@ -521,10 +522,12 @@ function _certbot() {
 
 function _mysqlTools() {
   local yes=0
+  local BAK_DIR="$MYSQL_CONF_DIR/backup"
   tips "********Mysql Tools****"
   cat <<EOF
-  (1) Export
-  (2) Import
+  (1) Export Data
+  (2) Import Data
+  (3) Create Databases
   (0) Exit
 EOF
   read -p "Now select the top option to: " input
@@ -533,8 +536,9 @@ EOF
     __determine "Mysql Export"
     yes=$?
     if [[ $yes == 1 ]]; then
-      local BAK_FILE="$MYSQL_CONF_DIR/backup.sql"
-      _bash mysql mysqldump --all-databases -uroot -p666666 >$BAK_FILE
+      mkdir -p $BAK_DIR
+      local BAK_FILE="$BAK_DIR/$TIME.sql"
+      _bash mysql mysqldump --all-databases -uroot -p$MYSQL_ROOT_PASSWORD > "$BAK_FILE"
       echo "export -> $BAK_FILE"
     else
       echo "Give up Export mysql"
@@ -544,7 +548,35 @@ EOF
     tips 'command:'
     echo "        ${BASH_SOURCE[0]} bash mysql"
     echo "        mysql -uroot -p$MYSQL_ROOT_PASSWORD"
-    echo "        source /mysql/backup.sql"
+    echo "        source /mysql/backup/xxx.sql"
+    ;;
+  3)
+    __Enter_Database_Name
+    tips "Please enter password for mysql user ${database_name}: "
+    read mysql_password
+    echo "Your password: ${mysql_password} "
+    cat >$BAK_DIR/.add_mysql.sql<<EOF
+CREATE USER '${database_name}'@'localhost' IDENTIFIED BY '${mysql_password}';
+CREATE USER '${database_name}'@'127.0.0.1' IDENTIFIED BY '${mysql_password}';
+CREATE USER '${database_name}'@'%' IDENTIFIED BY '${mysql_password}';
+GRANT USAGE ON *.* TO '${database_name}'@'localhost' with grant option;
+GRANT USAGE ON *.* TO '${database_name}'@'127.0.0.1' with grant option;
+CREATE DATABASE IF NOT EXISTS \`${database_name}\`;
+GRANT ALL PRIVILEGES ON \`${database_name}\`.* TO '${database_name}'@'localhost';
+GRANT ALL PRIVILEGES ON \`${database_name}\`.* TO '${database_name}'@'127.0.0.1';
+GRANT ALL PRIVILEGES ON \`${database_name}\`.* TO '${database_name}'@'%';
+FLUSH PRIVILEGES;
+EOF
+    cat >$BAK_DIR/.add_mysql.sh<<EOF
+#!/usr/bin/env bash
+
+mysql -uroot -p${MYSQL_ROOT_PASSWORD} < /mysql/backup/.add_mysql.sql
+EOF
+    _bash mysql chmod 777 /mysql/backup/.add_mysql.sh
+    _bash mysql /mysql/backup/.add_mysql.sh
+    [ $? -eq 0 ] && echo "Add database Sucessfully." || echo "Add database failed!"
+    rm -f $BAK_DIR/.add_mysql.sql
+    rm -f $BAK_DIR/.add_mysql.sh
     ;;
   0)
     exit 1
@@ -553,6 +585,19 @@ EOF
     echo "Please enter the correct option"
     ;;
   esac
+}
+
+function __Enter_Database_Name()
+{
+    while :;do
+        tips "Enter database name: "
+        read database_name
+        if [ "${database_name}" == "" ]; then
+            error "Database Name can't be empty!"
+        else
+            break
+        fi
+    done
 }
 
 function __determine() {
