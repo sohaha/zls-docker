@@ -173,9 +173,7 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 ### HTTPS 证书
 
 ```bash
-
 # ./run.sh ssl -d 要签名的域名 -w 项目访问路径
-
 ./run.sh ssl -d mydomain.com -w /home/zdocker/www/mydomain.com/public
 
 # 证书生成成功会拷贝一份到 /config/nginx/conf.d/certs/mydomain.com/ 目录
