@@ -34,7 +34,7 @@
 
 ## 快速上手
 
-1. 安装git、 docker 和 docker-compose
+1. 安装 git、 docker 和 docker-compose
 
 docker >=19
 
@@ -68,7 +68,9 @@ docker-compose up nginx mysql php
 
 更多配置请打开 .env 文件查看。
 
-### php 扩展
+### PHP 使用
+
+**安装扩展**
 
 ```bash
 # 编辑.env文件，
@@ -82,20 +84,33 @@ PHP_EXTENSIONS=swoole,redis
 # Windows 请执行 docker-compose build php && docker-compose up php -d
 ```
 
-### 数据库
+**定时任务**
 
-在其它容器需要连接数据库 HOST: mysql 即可(或172.0.0.20)。
+有些时候需要配置定时任务做一些特定业务处理，但是 PHP 容器内是不支持的，不过我们可以直接在宿主机上设置。
 
-如需修改默认密码，编辑.env文件即可，
+```bash
+# 假设是需要每分钟执行一次 www/test/task.php
 
-MySQL：`MYSQL_ROOT_PASSWORD=666666`，
+# crontab -e
+# 下面语句就是每分钟进入 php 容器 执行 `php test/task.php`
+* * * * * zdc bash php php test/task.php
+```
 
-mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
+### 数据库使用
 
-必须在容器生成之前，如果容器已经生成过，
+- 在其它容器需要连接数据库 HOST 直接填容器名,如使用 MySQL: mysql 即可(或 172.0.0.20)。
 
-请使用bash进入容器内修改，具体方法请谷歌。
+- 如需修改默认密码，编辑.env 文件即可，
 
+  MySQL：`MYSQL_ROOT_PASSWORD=666666`，
+
+  mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
+
+  必须在容器生成之前，如果容器已经生成过，
+
+  请使用 bash 进入容器内修改，具体方法请谷歌。
+
+- Msqyl 建立新数据库直接执行: `zdc mysql` 然后选 3（ Create Databases）即可。
 
 ## 日常使用
 
@@ -109,7 +124,6 @@ mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
 
 zdocker help
 ```
-
 
 ### 命令行
 
@@ -125,7 +139,7 @@ zdocker help
 
 ### 重新加载
 
-nginx，php-fpm之类的修改了配置是需要重新加载的，可使用该命令
+nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该命令
 
 ```bash
 # 不值得容器默认为nginx，下面命令等同 ./run.sh reload nginx
@@ -156,7 +170,7 @@ nginx，php-fpm之类的修改了配置是需要重新加载的，可使用该�
 ./run.sh tools
 ```
 
-### 生成HTTPS证书
+### HTTPS 证书
 
 ```bash
 
@@ -172,7 +186,7 @@ nginx，php-fpm之类的修改了配置是需要重新加载的，可使用该�
 
 **权限问题**
 
-如果不是root用户或提示权限问题，可将当前用户加入docker用户组
+如果不是 root 用户或提示权限问题，可将当前用户加入 docker 用户组
 
 ```bash
 sudo groupadd docker
@@ -182,9 +196,9 @@ sudo service docker restart
 
 **Pull 太慢**
 
-如果是国内服务器请尝试更换docker源为国内源
+如果是国内服务器请尝试更换 docker 源为国内源
 
-```bash 
+```bash
 vi /etc/docker/daemon.json
 
 # {"registry-mirrors": ["https://registry.docker-cn.com"]}
@@ -194,9 +208,7 @@ vi /etc/docker/daemon.json
 
 查看 logs 目录，参考日志信息处理。
 
-
-
-**安装YAPI**
+**安装 YAPI**
 
 ```bash
 # 先启动 mongodb

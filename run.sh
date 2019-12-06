@@ -523,6 +523,8 @@ function _certbot() {
 function _mysqlTools() {
   local yes=0
   local BAK_DIR="$MYSQL_CONF_DIR/backup"
+  local BAK_FILE="$BAK_DIR/$TIME.sql"
+  mkdir -p $BAK_DIR
   tips "********Mysql Tools****"
   cat <<EOF
   (1) Export Data
@@ -536,8 +538,6 @@ EOF
     __determine "Mysql Export"
     yes=$?
     if [[ $yes == 1 ]]; then
-      mkdir -p $BAK_DIR
-      local BAK_FILE="$BAK_DIR/$TIME.sql"
       _bash mysql mysqldump --all-databases -uroot -p$MYSQL_ROOT_PASSWORD > "$BAK_FILE"
       echo "export -> $BAK_FILE"
     else
