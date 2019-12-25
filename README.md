@@ -84,11 +84,11 @@ PHP_EXTENSIONS=swoole,redis
 # Windows 请执行 docker-compose build php && docker-compose up php -d
 ```
 
-**定时任务**
+### 定时任务
 
-有些时候需要配置定时任务做一些特定业务处理，但是 PHP 容器内是不支持的，不过我们可以直接在宿主机上设置。
+有些时候需要配置定时任务做一些特定业务处理，但是直接在容器内是不支持的，不过我们可以直接在宿主机上设置。
 
-!> 请确定crontab下docker-compose能正常使用，如果不能请尝试执行 `sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose` 再试。
+!> 请确定 crontab 下 docker-compose 能正常使用，如果不能请尝试执行 `sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose` 再试。
 
 ```bash
 # 假设是需要每分钟执行一次 www/test/task.php
