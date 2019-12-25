@@ -88,12 +88,14 @@ PHP_EXTENSIONS=swoole,redis
 
 有些时候需要配置定时任务做一些特定业务处理，但是 PHP 容器内是不支持的，不过我们可以直接在宿主机上设置。
 
+!> 请确定crontab下docker-compose能正常使用，如果不能请尝试执行 `sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose` 再试。
+
 ```bash
 # 假设是需要每分钟执行一次 www/test/task.php
 
 # crontab -e
 # 下面语句就是每分钟进入 php 容器 执行 `php test/task.php`
-* * * * * zdc bash php php test/task.php
+* * * * * zdc cron php php test/task.php
 ```
 
 ### 数据库使用

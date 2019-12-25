@@ -75,6 +75,9 @@ function main() {
   bash)
     _bash $@
     ;;
+  cron)
+    _cron $@
+    ;;
   php | composer)
     _php $@
     ;;
@@ -141,6 +144,7 @@ function _help() {
   tips " $cmd status       View status"
   tips " $cmd stats        Display resources used"
   tips " $cmd bash         Exec Services"
+  tips " $cmd cron         Exec Crontab"
   tips " $cmd build        Build services"
   tips " $cmd buildUp      Build and start services"
   tips " $cmd tools        Toolbox"
@@ -322,6 +326,27 @@ function _bash() {
     fi
   fi
   docker-compose exec $container $cmd
+}
+
+function _cron() {
+  local container
+  local cmd
+  container=$1
+  shift
+  cmd=$@
+  if [[ "" == $container ]]; then
+    tips "No service is specified (default service): $defaultBashContainer"
+    container=$defaultBashContainer
+  fi
+  if [[ "" == $cmd ]]; then
+    if [[ "go" == $container ]]; then
+      container="go"
+      cmd="bash"
+    else
+      cmd="sh"
+    fi
+  fi
+   docker-compose exec -T $container $cmd
 }
 
 function _stop() {
@@ -624,6 +649,7 @@ function __yapi() {
 
 function __sentry() {
   local cmd=${BASH_SOURCE[0]}
+  # shellcheck disable=SC2001
   cmd=$(echo $cmd | sed 's:\/usr\/bin\/::g')
   docker-compose up -d sentry sentry_celery_beat sentry_celery_worker
   tips "For the first time, please execute the following command to initialize sentry:\n"
