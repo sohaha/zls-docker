@@ -85,6 +85,8 @@ services:
         ipv4_address: 172.0.0.30
     extra_hosts:
       - "nginx.docker:172.0.0.10"
+    security_opt:
+      - "seccomp=./config/php/seccomp.json"
 
 ### mysql ##########
   mysql:

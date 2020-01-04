@@ -32,6 +32,18 @@ if [ -z "${EXTENSIONS##*,swoole,*}" ]; then
     && docker-php-ext-enable swoole
 fi
 
+if [ -z "${EXTENSIONS##*,swoole_tracker,*}" ]; then
+    echo "---------- Install swoole_tracker ----------"
+    cd /tmp/extensions
+    chmod +x ./swoole-tracker-install.sh && \
+    ./swoole-tracker-install.sh && \
+    rm ./swoole-tracker-install.sh
+    echo -e "Tip:\033[32m echo -e 'extension=/usr/local/etc/php/swoole-tracker/swoole_tracker73.so\napm.enable=1\napm.sampling_rate=100' > /usr/local/etc/php/conf.d/swoole-tracker.ini \033[0m"
+    echo "Tip: zdc reload php"
+    cp -r swoole-tracker /usr/local/etc/php/
+
+fi
+
 if [ -z "${EXTENSIONS##*,mongodb,*}" ]; then
     echo "---------- Install mongodb ----------"
     pecl install mongodb
@@ -71,8 +83,8 @@ fi
 
 if [ -z "${EXTENSIONS##*,xdebug,*}" ]; then
     echo "---------- Install xdebug ----------"
-    mkdir xdebug \
-    && tar -xf xdebug-2.6.1.tgz -C xdebug --strip-components=1 \
+    cd /tmp/extensions
+    tar -xf xdebug-2.6.1.tgz -C xdebug --strip-components=1 \
     && ( cd xdebug && phpize && ./configure && make ${MC} && make install ) \
     && docker-php-ext-enable xdebug
 fi

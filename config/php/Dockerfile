@@ -28,6 +28,7 @@ RUN export MC="-j$(nproc)" \
     && php -m \
     && echo "install composer" \
     && cd /tmp \
+    # && wget https://mirrors.aliyun.com/composer/composer.phar \
     && wget https://github.com/composer/composer/releases/download/${COMPOSER_VERSION}/composer.phar \
     && chmod a+rwx composer.phar \
     && mv composer.phar /usr/local/bin/composer \
