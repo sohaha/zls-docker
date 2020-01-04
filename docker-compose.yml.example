@@ -75,6 +75,7 @@ services:
       - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
       - ${PHP_LOG_DIR}:/var/log/php
       - ${COMPOSER_DATA_DIR}:/composer:rw
+      - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
     restart: always
     environment:
       TZ: Asia/Shanghai

@@ -204,6 +204,27 @@ vi /etc/docker/daemon.json
 # {"registry-mirrors": ["https://registry.docker-cn.com"]}
 ```
 
+**Swoole 版本**
+
+默认情况安装的是最新版的 Swoole, 如果需要指定版本直接修改安装脚本 `config/php/extensions/php.sh`
+
+**swoole_tracker 扩展**
+
+安装之后需要手动设置启动并且重新启动 php 进程 
+
+```bash
+# 先进入容器内
+zdc bash php 
+# 执行命令设置扩展
+echo -e 'extension=/usr/local/etc/php/swoole-tracker/swoole_tracker73.so\napm.enable=1\napm.sampling_rate=100' > /usr/local/etc/php/conf.d/swoole-tracker.ini
+# 启动客户端
+nohup /opt/swoole/script/php/swoole_php /opt/swoole/node-agent/src/node.php 2>&1 &
+# 退出容器
+exit
+# 重新启动 php 进程 
+zdc reload php
+```
+
 **启动失败**
 
 查看 logs 目录，参考日志信息处理。

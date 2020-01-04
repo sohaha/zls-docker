@@ -28,8 +28,18 @@ fi
 
 if [ -z "${EXTENSIONS##*,swoole,*}" ]; then
     echo "---------- Install swoole ----------"
-    pecl install swoole \
-    && docker-php-ext-enable swoole
+    # git clone --depth=1
+    cd /tmp/extensions
+    curl -o ./swoole.tar.gz https://github.com/swoole/swoole-src/archive/master.tar.gz -L && \
+    tar zxvf ./swoole.tar.gz && \
+    mv swoole-src* swoole-src && \
+    cd swoole-src && \
+    phpize && \
+    ./configure \
+    --enable-http2 && \
+    make clean && make && make install
+    # pecl install swoole \
+    docker-php-ext-enable swoole
 fi
 
 if [ -z "${EXTENSIONS##*,swoole_tracker,*}" ]; then
@@ -38,10 +48,8 @@ if [ -z "${EXTENSIONS##*,swoole_tracker,*}" ]; then
     chmod +x ./swoole-tracker-install.sh && \
     ./swoole-tracker-install.sh && \
     rm ./swoole-tracker-install.sh
-    echo -e "Tip:\033[32m echo -e 'extension=/usr/local/etc/php/swoole-tracker/swoole_tracker73.so\napm.enable=1\napm.sampling_rate=100' > /usr/local/etc/php/conf.d/swoole-tracker.ini \033[0m"
-    echo "Tip: zdc reload php"
+    echo -e "\033[32m echo -e 'extension=/usr/local/etc/php/swoole-tracker/swoole_tracker73.so\napm.enable=1\napm.sampling_rate=100' > /usr/local/etc/php/conf.d/swoole-tracker.ini \033[0m"
     cp -r swoole-tracker /usr/local/etc/php/
-
 fi
 
 if [ -z "${EXTENSIONS##*,mongodb,*}" ]; then
