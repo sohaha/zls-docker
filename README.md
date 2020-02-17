@@ -41,8 +41,12 @@ docker >=19
 docker-compose >= 3
 
 系统自带的 yum、apt 安装版本可能会过低了，
+
 如不清楚如果不熟悉怎么安装 docker，
-执行可以拉取项目后执行 ./run.sh installDocker 查看相关安装命令。
+
+执行可以拉取项目后执行 ./run.sh installDocker 查看相关安装命令，
+
+或查看 [docker.md](docker.md) 参考安装步骤。
 
 2. 拉取项目
 
@@ -184,44 +188,24 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 
 ### 更多问题
 
-**权限问题**
-
-如果不是 root 用户或提示权限问题，可将当前用户加入 docker 用户组
-
-```bash
-sudo groupadd docker
-sudo gpasswd -a ${USER} docker
-sudo service docker restart
-```
-
-**Pull 太慢**
-
-如果是国内服务器请尝试更换 docker 源为国内源
-
-```bash
-vi /etc/docker/daemon.json
-
-# {"registry-mirrors": ["https://registry.docker-cn.com"]}
-```
-
 **Swoole 版本**
 
 默认情况安装的是最新版的 Swoole, 如果需要指定版本直接修改安装脚本 `config/php/extensions/php.sh`
 
 **swoole_tracker 扩展**
 
-安装之后需要手动设置启动并且重新启动 php 进程 
+安装之后需要手动设置启动并且重新启动 php 进程
 
 ```bash
 # 先进入容器内
-zdc bash php 
+zdc bash php
 # 执行命令设置扩展
 echo -e 'extension=/usr/local/etc/php/swoole-tracker/swoole_tracker73.so\napm.enable=1\napm.sampling_rate=100' > /usr/local/etc/php/conf.d/swoole-tracker.ini
 # 启动客户端
 nohup /opt/swoole/script/php/swoole_php /opt/swoole/node-agent/src/node.php 2>&1 &
 # 退出容器
 exit
-# 重新启动 php 进程 
+# 重新启动 php 进程
 zdc reload php
 ```
 
