@@ -261,3 +261,58 @@ services:
       - SYS_PTRACE
     networks:
       - defNetworks
+
+### drone ##########
+  drone-server:
+    image: drone/drone:latest
+    ports:
+      - '8080:80'
+      - 8843:443
+      - 9000
+    volumes:
+      - ./data/drone:/var/lib/drone/
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # - DRONE_LOGS_TRACE=true
+      - DRONE_OPEN=true
+      # 访问域名或 IP
+      - DRONE_SERVER_HOST=x.x.x.x:8080
+      - DRONE_DEBUG=true
+      - DRONE_GIT_ALWAYS_AUTH=false
+      # - DRONE_GOGS=true
+      # - DRONE_GOGS_SKIP_VERIFY=false
+      # - DRONE_GOGS_SERVER=http://gogs.com
+      - DRONE_PROVIDER=gogs
+      - DRONE_SERVER_PROTO=http
+      - DRONE_RPC_SECRET=QWASFGTTG767TU4345435
+      - DRONE_SECRET=QWASFGTTG767TU4345435
+      - DRONE_DATABASE_DATASOURCE=/var/lib/drone/drone.sqlite
+      - DRONE_DATABASE_DRIVER=sqlite3
+      # - DRONE_DATABASE_DRIVER=mysql
+      # - DRONE_DATABASE_DATASOURCE="root:${MYSQL_ROOT_PASSWORD}@tcp(172.0.0.20:3306)/drone?parseTime=true"
+    depends_on:
+      - drone-agent
+    networks:
+      - defNetworks
+    restart: always
+
+  drone-agent:
+    image: drone/agent:latest
+    environment:
+      - DRONE_RPC_SERVER=http://drone-server
+      - DRONE_RPC_SECRET=QWASFGTTG767TU4345435
+      - DRONE_DEBUG=true
+      # - DOCKER_HOST=tcp://docker-bind:2375
+      - DRONE_SERVER=drone-server:9000
+      - DRONE_SECRET=QWASFGTTG767TU4345435
+      - DRONE_MAX_PROCS=5
+    networks:
+      - defNetworks
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  # docker-bind:
+  #   image: docker:dind
+  #   privileged: true
+  #   networks:
+  #     - defNetworks
+  #   command: --storage-driver=overlay
