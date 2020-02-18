@@ -46,7 +46,7 @@ docker-compose >= 3
 
 执行可以拉取项目后执行 ./run.sh installDocker 查看相关安装命令，
 
-或查看 [docker.md](docker.md) 参考安装步骤。
+或查看 [docker.md](./docker.md) 参考安装步骤。
 
 2. 拉取项目
 
@@ -116,7 +116,9 @@ PHP_EXTENSIONS=swoole,redis
 
   请使用 bash 进入容器内修改，具体方法请谷歌。
 
-- Msqyl 建立新数据库直接执行: `zdc mysql` 然后选 3（ Create Databases）即可。
+- Msqyl 建立新数据库直接执行: `zdc mysql` 然后选 3（ Create Databases ）即可。
+
+---
 
 ## 日常使用
 

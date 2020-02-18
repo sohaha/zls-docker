@@ -318,8 +318,7 @@ function _bash() {
     container=$defaultBashContainer
   fi
   if [[ "" == $cmd ]]; then
-    if [[ "go" == $container ]]; then
-      container="go"
+    if [[ "go" == $container || "mysql" == $container ]]; then
       cmd="bash"
     else
       cmd="sh"
