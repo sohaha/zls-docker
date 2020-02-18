@@ -550,8 +550,21 @@ function _mysqlTools() {
   local BAK_DIR="$MYSQL_CONF_DIR/backup"
   local BAK_FILE="$BAK_DIR/$TIME.sql"
   mkdir -p $BAK_DIR
-  if [[ "" == $container ]]; then
-    echo "export -> $BAK_FILE"
+  if [[ "bak" == $1 ]]; then
+    cat >$BAK_DIR/.bak_mysql.sh<<EOF
+#!/usr/bin/env bash
+
+mysql -e "show databases;" -uroot -p${MYSQL_ROOT_PASSWORD} | grep -Ev "Database|information_schema|mysql|test|performance_schema|information_schema" | xargs mysqldump -uroot -p${MYSQL_ROOT_PASSWORD} --databases > "/mysql/backup/${TIME}.sql"
+EOF
+    _bash mysql chmod 777 /mysql/backup/.bak_mysql.sh
+    _bash mysql /mysql/backup/.bak_mysql.sh
+    if [ $? -eq 0 ];then
+      echo "bak database Sucessfully."
+      echo "export -> $BAK_FILE"
+    else
+      echo "bak database failed!"
+    fi
+    rm -f $BAK_DIR/.bak_mysql.sh
     exit
   fi
   tips "********Mysql Tools****"

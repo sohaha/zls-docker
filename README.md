@@ -195,7 +195,7 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 
 ```mysql
 # 为了安全性建议把 %.root 的密码修改成其他密码（默认密码：666666）
-ALTER USER `root`@`%` IDENTIFIED BY 'Q378238a',`root`@`localhost` PASSWORD EXPIRE NEVER;
+ALTER USER `root`@`%` IDENTIFIED BY 'Q378238a',`root`@`%` PASSWORD EXPIRE NEVER;
 ```
 
 **Swoole 版本**
