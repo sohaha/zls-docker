@@ -109,7 +109,7 @@ function main() {
     _tools
     ;;
   mysql)
-    _mysqlTools
+    _mysqlTools $@
     ;;
   installDocker | installdocker)
     _installDocker
@@ -550,6 +550,10 @@ function _mysqlTools() {
   local BAK_DIR="$MYSQL_CONF_DIR/backup"
   local BAK_FILE="$BAK_DIR/$TIME.sql"
   mkdir -p $BAK_DIR
+  if [[ "" == $container ]]; then
+    echo "export -> $BAK_FILE"
+    exit
+  fi
   tips "********Mysql Tools****"
   cat <<EOF
   (1) Export Data

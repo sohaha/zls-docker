@@ -188,6 +188,16 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 
 ### 更多问题
 
+**数据库安全**
+
+默认情况数据库是禁止外部连接的，如果需要开启请修改 .env 中的 MySQL 配置，
+把 `MYSQL_HOST_PORT=127.0.0.1:3306` 改成 `MYSQL_HOST_PORT=3306`
+
+```mysql
+# 为了安全性建议把 %.root 的密码修改成其他密码（默认密码：666666）
+ALTER USER `root`@`%` IDENTIFIED BY 'Q378238a',`root`@`localhost` PASSWORD EXPIRE NEVER;
+```
+
 **Swoole 版本**
 
 默认情况安装的是最新版的 Swoole, 如果需要指定版本直接修改安装脚本 `config/php/extensions/php.sh`
