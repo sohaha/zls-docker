@@ -464,7 +464,7 @@ function __path() {
 
 function _logs() {
   local container=$1
-  docker-compose $container
+  docker-compose logs $container
 }
 
 function _certbot() {

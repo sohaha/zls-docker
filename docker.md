@@ -67,4 +67,11 @@ sudo service docker restart
 vi /etc/docker/daemon.json
 
 # {"registry-mirrors": ["https://registry.docker-cn.com"]}
+
+# 腾讯云
+# {"registry-mirrors": ["https://mirror.ccs.tencentyun.com"]}
+
+# 编辑后重启 dokcer
+systemctl daemon-reload
+systemctl restart docker
 ```
