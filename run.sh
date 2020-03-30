@@ -75,6 +75,9 @@ function main() {
   bash)
     _bash $@
     ;;
+  bash2)
+    _bash2 $@
+    ;;
   cron)
     _cron $@
     ;;
@@ -119,6 +122,9 @@ function main() {
     ;;
   logs)
     _logs $@
+    ;;
+  name)
+    echo $WORK_NAME
     ;;
   *)
     _help $@
@@ -327,6 +333,26 @@ function _bash() {
   docker-compose exec $container $cmd
 }
 
+function _bash2() {
+  local container
+  local cmd
+  container=$1
+  shift
+  cmd=$@
+  if [[ "" == $container ]]; then
+    tips "No service is specified (default service): $defaultBashContainer"
+    container=$defaultBashContainer
+  fi
+  if [[ "" == $cmd ]]; then
+    if [[ "go" == $container || "mysql" == $container ]]; then
+      cmd="bash"
+    else
+      cmd="sh"
+    fi
+  fi
+  docker-compose exec -T $container $cmd
+}
+
 function _cron() {
   local container
   local cmd
@@ -398,6 +424,7 @@ function _reload() {
 function _build() {
   local container
   container=$@
+  # --force-recreate
   if [[ "" == $container ]]; then
     error "Please enter the compiled service"
   else
@@ -428,8 +455,8 @@ function _php() {
 
     #docker run --tty --interactive --rm --user $(id -u):$(id -g) --cap-add SYS_PTRACE --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro --volume $composerPath:/composer:rw --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" $@
   else
-    _bash $phpv php $@
-    # docker run --tty --interactive --rm --cap-add SYS_PTRACE --volume $composerPath:/composer:rw --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" php $@
+    # _bash $phpv php $@
+    docker run --tty --interactive --rm --cap-add SYS_PTRACE --volume $composerPath:/composer:rw --volume $SCRIPT_SOURCE_DIR:/var/www/html --workdir /var/www/html $WORK_NAME"_php" php $@
   fi
 }
 
@@ -562,6 +589,9 @@ EOF
       echo "export -> $BAK_FILE"
     else
       echo "bak database failed!"
+      echo $(pwd)
+      echo $BAK_DIR
+      cat $BAK_DIR/.bak_mysql.sh
     fi
     rm -f $BAK_DIR/.bak_mysql.sh
     exit
