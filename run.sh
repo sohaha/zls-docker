@@ -222,10 +222,11 @@ function _installDocker() {
   elif [[ "" != $(echo $info | grep Ubuntu) ]]; then
     tips 'OS is Ubuntu'
     tips 'command:'
-    tips "        sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common"
-    tips "        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
-    tips "        sudo apt-get update"
-    tips "        sudo apt-get install docker-ce docker-ce-cli containerd.io"
+    tips "        sudo curl -sSL https://get.docker.com | sh"
+    tips "        sudo usermod pi -aG docker"
+    tips "        sudo curl -L https://get.daocloud.io/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
+    tips "        sudo chmod +x /usr/local/bin/docker-compose"
+    tips "        docker-compose --version"
     tips "start:  "
     tips "        sudo service start docker"
   else
