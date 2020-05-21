@@ -508,10 +508,12 @@ function _certbot() {
   local debug
   local force
   if [ ! -f "$ACME" ]; then
-    echo -e "\e[31m$ACME does not exist, installing...\e[0m"
+    tips "$ACME does not exist, installing..."
     curl https://get.acme.sh | sh
     # 自动更新
     $ACME --upgrade  --auto-upgrade
+    tips "Please set a scheduled task:"
+    echo -e "    55 5 * * * $cmd reload"
   fi
 
   if [[ "$1" == "" ]]; then
