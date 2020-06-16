@@ -152,6 +152,8 @@ services:
     depends_on:
      - redis
      - postgres
+     - sentry_celery_beat
+     - sentry_celery_worker
     ports:
      - ${SENTRY_PORT}:9000
     environment:

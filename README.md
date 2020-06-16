@@ -225,6 +225,17 @@ zdc reload php
 
 查看 logs 目录，参考日志信息处理。
 
+**安装 sentry**
+
+首次启动之后需要初始化数据库，然后访问 http://127.0.0.1:9000
+
+```bash
+# 首次启动一定一定要修改 SENTRY_SECRET_KEY ，下面这条命令可以动态生成一个 SECRET_KEY
+# docker run --rm sentry config generate-secret-key
+# 初始化数据库，过程需要填写邮箱与密码
+zdc bash sentry sentry upgrade
+```
+
 **安装 YAPI**
 
 ```bash
