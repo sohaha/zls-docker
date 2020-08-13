@@ -47,6 +47,7 @@ services:
       - ${SOURCE_DIR}:/var/www/html/:rw
       - ${NGINX_LOG_DIR}:/var/log/nginx/:rw
       - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
+      - ${LUA_DIR}:/usr/local/openresty/nginx/conf/lua:rw
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
     restart: always
     depends_on:
@@ -54,6 +55,8 @@ services:
      - redis
     environment:
       TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
     networks:
       defNetworks:
         ipv4_address: 172.0.0.10
@@ -63,7 +66,6 @@ services:
     build:
       context: ./config/php/
       args:
-        PHP_VERSION: ${PHP_VERSION}
         PHP_IMAGES: ${PHP_IMAGES}
         ALPINE_REPOSITORIES: ${ALPINE_REPOSITORIES}
         PHP_EXTENSIONS: ${PHP_EXTENSIONS}
@@ -80,6 +82,8 @@ services:
     restart: always
     environment:
       TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
     cap_add:
       - SYS_PTRACE
     networks:
@@ -123,7 +127,7 @@ services:
     restart: always
     environment:
       TZ: Asia/Shanghai
-    entrypoint: ["redis-server", "/etc/redis.conf"]
+    entrypoint: ["redis-server", "/etc/redis.conf","--requirepass","${REDIS_PASSWORD}"]
     networks:
       defNetworks:
         ipv4_address: 172.0.0.40

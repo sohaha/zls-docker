@@ -3,7 +3,6 @@
 echo
 echo "============================================"
 echo "Install extensions from   : ${MORE_EXTENSION_INSTALLER}"
-echo "PHP version               : ${PHP_VERSION}"
 echo "Extra Extensions          : ${PHP_EXTENSIONS}"
 echo "Multicore Compilation     : ${MC}"
 echo "Work directory            : ${PWD}"
@@ -43,15 +42,15 @@ if [ -z "${EXTENSIONS##*,swoole,*}" ]; then
     docker-php-ext-enable swoole
 fi
 
-if [ -z "${EXTENSIONS##*,swoole_tracker,*}" ]; then
-    echo "---------- Install swoole_tracker ----------"
-    cd /tmp/extensions
-    chmod +x ./swoole-tracker-install.sh && \
-    ./swoole-tracker-install.sh && \
-    rm ./swoole-tracker-install.sh
-    echo -e "\033[32m echo -e 'extension=/usr/local/etc/php/swoole-tracker/swoole_tracker73.so\napm.enable=1\napm.sampling_rate=100' > /usr/local/etc/php/conf.d/swoole-tracker.ini \033[0m"
-    cp -r swoole-tracker /usr/local/etc/php/
-fi
+# if [ -z "${EXTENSIONS##*,swoole_tracker,*}" ]; then
+#     echo "---------- Install swoole_tracker ----------"
+#     cd /tmp/extensions
+#     chmod +x ./swoole-tracker-install.sh && \
+#     ./swoole-tracker-install.sh && \
+#     rm ./swoole-tracker-install.sh
+#     echo -e "\033[32m echo -e 'extension=/usr/local/etc/php/swoole-tracker/swoole_tracker73.so\napm.enable=1\napm.sampling_rate=100' > /usr/local/etc/php/conf.d/swoole-tracker.ini \033[0m"
+#     cp -r swoole-tracker /usr/local/etc/php/
+# fi
 
 if [ -z "${EXTENSIONS##*,mongodb,*}" ]; then
     echo "---------- Install mongodb ----------"

@@ -1,4 +1,3 @@
-ARG PHP_VERSION
 ARG PHP_IMAGES
 FROM ${PHP_IMAGES}
 
@@ -20,18 +19,13 @@ ENV COMPOSER_PACKAGIST="${COMPOSER_PACKAGIST}"
 
 RUN export MC="-j$(nproc)" \
     && chmod +x install.sh \
+    && chmod +x install-composer.sh \
     && chmod +x "${MORE_EXTENSION_INSTALLER}"\
     && sh install.sh \
     && sh "${MORE_EXTENSION_INSTALLER}" \
-    && rm -rf /tmp/extensions \
     && php -v \
     && php -m \
-    && echo "install composer" \
-    && cd /tmp \
-    # && wget https://mirrors.aliyun.com/composer/composer.phar \
-    && wget https://github.com/composer/composer/releases/download/${COMPOSER_VERSION}/composer.phar \
-    && chmod a+rwx composer.phar \
-    && mv composer.phar /usr/local/bin/composer \
-    && composer config -l -g
+    && bash install-composer.sh \
+    && rm -rf /tmp/extensions 
 
 WORKDIR /var/www/html

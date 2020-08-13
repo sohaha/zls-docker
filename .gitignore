@@ -2,6 +2,7 @@
 .env
 .idea/
 .vscode/
+tmp/
 !www/localhost/
 docker-compose.yml
 www/

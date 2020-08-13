@@ -29,7 +29,7 @@ function getMysqlVersion()
 {
     if (extension_loaded('PDO_MYSQL')) {
         try {
-            $dbh = new PDO('mysql:host=mysql;dbname=mysql', 'root', '666666');
+            $dbh = new PDO('mysql:host=mysql;dbname=mysql', 'root', $_SERVER['MYSQL_ROOT_PASSWORD']??'');
             $sth = $dbh->query('SELECT VERSION() as version');
             $info = $sth->fetch();
         } catch (PDOException $e) {
@@ -54,6 +54,7 @@ function getRedisVersion()
         try {
             $redis = new Redis();
             $redis->connect('redis', 6379);
+            $redis->auth($_SERVER['REDIS_PASSWORD'] ?? '');
             /** @var array $info */
             $info = $redis->info();
             return $info['redis_version'];
