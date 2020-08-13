@@ -51,6 +51,7 @@ services:
     restart: always
     depends_on:
      - php
+     - redis
     environment:
       TZ: Asia/Shanghai
     networks:
@@ -124,7 +125,8 @@ services:
       TZ: Asia/Shanghai
     entrypoint: ["redis-server", "/etc/redis.conf"]
     networks:
-      - defNetworks
+      defNetworks:
+        ipv4_address: 172.0.0.40
 
 ### mongodb ##########
   mongodb:

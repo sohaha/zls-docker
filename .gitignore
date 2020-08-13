@@ -5,5 +5,4 @@
 !www/localhost/
 docker-compose.yml
 www/
-data
-!.gitignore
+data/
