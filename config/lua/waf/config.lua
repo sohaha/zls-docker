@@ -2,11 +2,11 @@
 Author: seekwe
 Date: 2019-10-27 18:24:58
 Last Modified by:: seekwe
-Last Modified time: 2020-08-14 14:21:42
+Last Modified time: 2020-08-14 20:46:44
 --]]
 
 --规则存放目录
-RulePath = "/usr/local/openresty/nginx/conf/lua/waf/wafconf/"
+RulePath = "wafconf/"
  --是否开启攻击信息记录，需要配置logdir
 Attacklog = "off"
 --log存储目录，该目录需要用户自己新建，切需要nginx用户的可写权限

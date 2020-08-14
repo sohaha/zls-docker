@@ -2,7 +2,7 @@
 Author: seekwe
 Date: 2019-10-27 18:24:58
 Last Modified by:: seekwe
-Last Modified time: 2020-08-14 18:07:06
+Last Modified time: 2020-08-14 20:47:22
 --]]
 
 require 'config'
@@ -71,7 +71,14 @@ end
 function read_rule(var)
     file = io.open(rulepath..'/'..var,"r")
     if file==nil then
-        return
+        local info = debug.getinfo(1, "S")
+        local path = info.source
+        path = string.sub(path, 2, -1)
+        path = string.match(path, "^.*/")
+        file = io.open(path..rulepath..'/'..var,"r")
+        if file==nil then
+            return
+        end
     end
     t = {}
     for line in file:lines() do
@@ -310,4 +317,7 @@ function whiteip()
     end
     return false
 end
+
+
+
 
