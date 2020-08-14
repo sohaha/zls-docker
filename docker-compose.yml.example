@@ -52,7 +52,6 @@ services:
     restart: always
     depends_on:
      - php
-     - redis
     environment:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
@@ -112,6 +111,7 @@ services:
         ipv4_address: 172.0.0.20
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
       TZ: Asia/Shanghai
 
 ### redis ##########
