@@ -2,7 +2,7 @@
 Author: seekwe
 Date: 2019-10-27 18:24:58
 Last Modified by:: seekwe
-Last Modified time: 2020-08-13 19:06:05
+Last Modified time: 2020-08-14 18:07:06
 --]]
 
 require 'config'
@@ -11,15 +11,15 @@ local ngxmatch=ngx.re.match
 local unescape=ngx.unescape_uri
 local get_headers = ngx.req.get_headers
 local optionIsOn = function (options) return options == "on" and true or false end
-logpath = logdir 
+logpath = Logdir 
 rulepath = RulePath
 UrlDeny = optionIsOn(UrlDeny)
 PostCheck = optionIsOn(PostMatch)
 CookieCheck = optionIsOn(CookieMatch)
-WhiteCheck = optionIsOn(whiteModule)
-WhiteHostCheck = optionIsOn(whiteHostModule)
+WhiteCheck = optionIsOn(WhiteModule)
+WhiteHostCheck = optionIsOn(WhiteHostModule)
 PathInfoFix = optionIsOn(PathInfoFix)
-attacklog = optionIsOn(attacklog)
+Attacklog = optionIsOn(Attacklog)
 CCDeny = optionIsOn(CCDeny)
 Redirect=optionIsOn(Redirect)
 function getClientIp()
@@ -40,7 +40,7 @@ function write(logfile,msg)
     fd:close()
 end
 function log(method,url,data,ruletag)
-    if attacklog then
+    if Attacklog then
         local realIp = getClientIp()
         local ua = ngx.var.http_user_agent
         local servername=ngx.var.server_name
@@ -91,8 +91,8 @@ ckrules=read_rule('cookie')
 
 function say_html()
     if Redirect then
-        ngx.header.content_type = "text/html"
-        ngx.say(html)
+        ngx.header.content_type = "text/html;charset=utf8"
+        ngx.say(Html)
         ngx.exit(200)
     end
 end
@@ -112,7 +112,7 @@ end
 
 function whitehost()
 	if WhiteHostCheck then
-	    local items = Set(hostWhiteList)
+	    local items = Set(HostWhiteList)
 	    for host in pairs(items) do
 	    	if ngxmatch(ngx.var.host, host, "isjo") then
 				log('POST',ngx.var.request_uri,"-","white host".. host)
@@ -205,7 +205,7 @@ function denycc()
         local limit = ngx.shared.limit
         local req,_=limit:get(token)
         if req then
-            if req > CCcount then
+            if req >= CCcount then
                  ngx.exit(503)
                 return true
             else
@@ -249,11 +249,11 @@ function get_boundary()
 end
 
 function blockip()
-    if next(ipBlocklist) ~= nil then
+    if next(IpBlocklist) ~= nil then
         local cIP = getClientIp()
         local numIP = 0
         if cIP ~= "unknown" then numIP = tonumber(ipToDecimal(cIP)) end
-        for _,ip in pairs(ipBlocklist) do
+        for _,ip in pairs(IpBlocklist) do
             local s, e = string.find(ip, '-', 0, true)
             if s == nil and cIP == ip then
                 ngx.exit(403)
@@ -272,7 +272,7 @@ function blockip()
 end
 
 function fileExtCheck(ext)
-    local items = Set(black_fileExt)
+    local items = Set(BlackFileExt)
     ext=string.lower(ext)
     if ext then
         for rule in pairs(items) do
@@ -291,11 +291,11 @@ function Set (list)
 end
 
 function whiteip()
-    if next(ipWhitelist) ~= nil then
+    if next(IpWhitelist) ~= nil then
         local cIP = getClientIp()
         local numIP = 0
         if cIP ~= "unknown" then numIP = tonumber(ipToDecimal(cIP))  end
-        for _,ip in pairs(ipWhitelist) do
+        for _,ip in pairs(IpWhitelist) do
             local s, e = string.find(ip, '-', 0, true)
             if s == nil and cIP == ip then
                 return true

@@ -21,9 +21,9 @@
 │   │   └── php.ini                        php.ini 配置
 │   ├── redis
 │   │   └── redis.conf                     redis.conf 配置
-│   ├── golang
-│   ├── mongodb
-│   └── node
+│   ├── lua                                lua 脚本
+│   │   └── waf
+│   │       └── config.lua                 web 防火墙配置
 ├── data                                   数据目录
 ├── logs                                   日志目录
 ├── docker-compose.yml                     docker-compose 编排文件
