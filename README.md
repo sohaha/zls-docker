@@ -200,6 +200,18 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 ALTER USER `root`@`%` IDENTIFIED BY 'Q378238a',`root`@`%` PASSWORD EXPIRE NEVER;
 ```
 
+**MongoDB 启动失败**
+
+```
+/data/db/WiredTiger.wt: handle-open: open: Operation not permitted
+```
+
+原因: Windows 下不支持映射目录
+
+解决方案: 注释掉 `docker-compose.yml` 文件内的 `mongodb` 映射配置，
+
+`# - ${MONGODB_DATA_DIR}:/data/db:rw`
+
 **Swoole 版本**
 
 默认情况安装的是最新版的 Swoole, 如果需要指定版本直接修改安装脚本 `config/php/extensions/php.sh`
