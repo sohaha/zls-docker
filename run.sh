@@ -31,7 +31,7 @@ function main() {
     shift
   fi
   case "$cmd" in
-  status | s)
+  status | s | ps)
     _status $@
     ;;
   stop)
@@ -457,7 +457,18 @@ function _node() {
 
 function _go() {
   images go
-  docker run --tty --interactive --rm --volume $SCRIPT_SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_go" "$@"
+  local goproxy=https://goproxy.cn,direct
+  if [[ -n "${GOPROXY}" ]]; then
+    goproxy=$GOPROXY
+  fi
+  local cmd=$@
+  if [[ "bash" == $2 ]];then
+      docker run -it -e GOPROXY="$goproxy" --volume $SCRIPT_SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_go" bash
+    return
+  fi
+  if [[ -n "${GOPROXY}" ]]; then
+    docker run --tty --interactive -e GOPROXY="$goproxy" --volume $SCRIPT_SOURCE_DIR:/var/www/html:rw --workdir /var/www/html $WORK_NAME"_go" "$cmd"
+  fi
 }
 
 function images() {
