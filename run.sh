@@ -16,6 +16,7 @@ WORK_DIR=$(
   cd $(dirname $mydir)
   pwd
 )
+BIN_PATH="/usr/local/bin"
 WORK_NAME=${WORK_DIR##*/}
 SCRIPT_SOURCE_DIR=$(pwd)
 WHOAMI=$(whoami)
@@ -23,6 +24,9 @@ TIME=$(date "+%Y-%m-%d %H:%M:%S")
 cd $WORK_DIR
 
 function main() {
+  if [[ ! -d $BIN_PATH ]]; then
+    BIN_PATH="/usr/bin"
+  fi
   local cmd
   config
   judge
@@ -219,9 +223,8 @@ function _installDocker() {
 }
 
 function _install() {
-  #askRoot
-  local zdc="/usr/bin/zdc"
-  local zdocker="/usr/bin/zdocker"
+  local zdc="$BIN_PATH/zdc"
+  local zdocker="$BIN_PATH/zdocker"
   if [ -f "$zdocker" ]; then
     sudo mv -f $zdocker $zdocker"-old"
   fi
@@ -230,6 +233,7 @@ function _install() {
     tips "old zdc mv zdc-old"
     sudo mv -f $zdc $zdc"-old"
   fi
+
   sudo ln -s $WORK_DIR/run.sh $zdocker
   sudo ln -s $WORK_DIR/run.sh $zdc
   tips "You can now use zdc instead of ./run.sh: "
@@ -494,7 +498,7 @@ function _certbot() {
   local certsPath="$WORK_DIR"
   local ACME=~/.acme.sh/acme.sh
   local binCmd=$certsPath/.run.sh
-  local zdc="/usr/bin/zdc"
+  local zdc="$BIN_PATH/zdc"
   if [ -f "$zdc" ]; then
     binCmd=zdc
   fi
