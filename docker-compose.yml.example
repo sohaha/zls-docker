@@ -313,7 +313,8 @@ services:
     networks:
       - defNetworks
 
-  ### grafana ##########
+
+  ### monitor ##########
   grafana:
     image: ${GRAFANA_IMAGES}
     restart: always
@@ -324,8 +325,31 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
     networks:
       - defNetworks
+    depends_on:
+      - prometheus
+      - mysqlexporter
     volumes: 
       - ${GRAFANA_CONFIG_FILE}:/etc/grafana/grafana.ini:ro
       - ${GRAFANA_LOG_DIR}:/var/log/grafana:rw
       - ${GRAFANA_DATA_DIR}:/var/lib/grafana:rw
-      
+  prometheus:
+    image: ${PROM_IMAGES}
+    restart: always
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    environment:
+      TZ: Asia/Shanghai
+    networks:
+      - defNetworks
+    ports:
+      - '${PROM_PORT}:9090'
+    volumes: 
+      - ${PROM_CONFIG_FILE}:/etc/prometheus/prometheus.yml
+      - ${PROM_DATA_DIR}:/prometheus
+  mysqlexporter:
+    image: prom/mysqld-exporter:v0.12.1
+    networks:
+      - defNetworks
+    environment:
+      - DATA_SOURCE_NAME=root:${MYSQL_ROOT_PASSWORD}@(mysql:3306)/
