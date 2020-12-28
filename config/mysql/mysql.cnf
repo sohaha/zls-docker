@@ -26,6 +26,8 @@
 # log-bin                 = /var/lib/mysql/logbin.log
 # default-time-zone       = '+8:00'
 # # skip-grant-tables
+#
+# max_connections         = 10000
 
 [mysql]
 default-character-set   = utf8mb4

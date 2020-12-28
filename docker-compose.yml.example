@@ -312,3 +312,20 @@ services:
       - DRONE_RUNNER_NAME=drone-runner
     networks:
       - defNetworks
+
+  ### grafana ##########
+  grafana:
+    image: ${GRAFANA_IMAGES}
+    restart: always
+    ports:
+      - '${GRAFANA_PORT}:3000'
+    environment:
+      TZ: Asia/Shanghai
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+    networks:
+      - defNetworks
+    volumes: 
+      - ${GRAFANA_CONFIG_FILE}:/etc/grafana/grafana.ini:ro
+      - ${GRAFANA_LOG_DIR}:/var/log/grafana:rw
+      - ${GRAFANA_DATA_DIR}:/var/lib/grafana:rw
+      
