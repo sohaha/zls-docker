@@ -290,3 +290,7 @@ chmod 777 ./data/prometheus
 URL填: http://prometheus:9090 ，其他的默认保存即可，
 
 然后复制 `config/grafana/mysql-dashboard.json` 内容，贴贴到 ‘Import via panel json’ 创建完成。
+
+如需监控服务器性能：
+
+需手动启动（需要 docker root 权限） `zdc up nodeexporter`，再 `Import via grafana.com` 编码 8919。

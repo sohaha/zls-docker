@@ -353,3 +353,11 @@ services:
       - defNetworks
     environment:
       - DATA_SOURCE_NAME=root:${MYSQL_ROOT_PASSWORD}@(mysql:3306)/
+  nodeexporter:
+    image: prom/node-exporter:v1.0.1
+    command:
+      - '--path.rootfs=/host'
+    networks:
+      - defNetworks
+    volumes:
+      - '/:/host:ro,rslave'
