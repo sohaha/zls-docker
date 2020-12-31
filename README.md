@@ -239,7 +239,7 @@ zdc reload php
 
 **安装 sentry**
 
-首次启动之后需要初始化数据库，然后访问 http://127.0.0.1:9000
+首次启动之后需要初始化数据库，然后访问 http://127.0.0.1:9000 。
 
 ```bash
 # 首次启动一定一定要修改 SENTRY_SECRET_KEY ，下面这条命令可以动态生成一个 SECRET_KEY
@@ -267,3 +267,26 @@ db.createUser({user: "yapi",pwd: "666666",roles: [{role: "dbOwner",db: "yapi"}]}
 ./run.sh up yapi
 
 ```
+
+**安装监控服务**
+
+默认包含 grafana、prometheus、mysqlexporter。
+
+注意: 如果你是 Root 用户启动，首次启动之前需要先给数据目录写入权限
+
+```bash
+chmod 777 ./data/grafana
+chmod 777 ./data/prometheus
+```
+
+启动命令: zdc up grafana，
+
+然后访问 http://127.0.0.1:3010/ ( 默认账号 admin/admin666 )。
+
+配置 MySQL dashboard：
+
+首先添加 Data Sources 选 Prometheus ,
+
+URL填: http://prometheus:9090 ，其他的默认保存即可，
+
+然后复制 `config/grafana/mysql-dashboard.json` 内容，贴贴到 ‘Import via panel json’ 创建完成。
