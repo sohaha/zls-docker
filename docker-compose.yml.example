@@ -49,6 +49,7 @@ services:
       - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
       - ${LUA_DIR}:/usr/local/openresty/nginx/conf/lua:rw
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
+      - ${NGINX_CONF_FILE}:/usr/local/openresty/nginx/conf/nginx.conf:ro
     restart: always
     depends_on:
       - php
