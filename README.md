@@ -63,7 +63,7 @@ git clone --depth=1 https://github.com/sohaha/zls-docker.git
 # Windows 请先复制配置再执行启动命令
 copy .env.example .env
 copy docker-compose.yml.example docker-compose.yml
-docker-compose up nginx mysql php
+docker-compose up -d nginx mysql php
 ```
 
 5. 访问在浏览器中访问 http://localhost/ 。
