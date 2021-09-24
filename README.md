@@ -183,7 +183,7 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 **首次使用**
 
 ```bash
-# 先把签证服务修改为 letsencrypt
+# 建议先把签证服务修改为 letsencrypt
 ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
 
 # 配置定时任务 nginx 读取最新证书
