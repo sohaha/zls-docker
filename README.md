@@ -180,8 +180,22 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 
 ### HTTPS 证书
 
+**首次使用**
+
 ```bash
-# ./run.sh ssl -d 要签名的域名 -w 项目访问路径
+# 先把签证服务修改为 letsencrypt
+~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+
+# 配置定时任务 nginx 读取最新证书
+crontab -e
+
+# 填入以下命令，如果没有安装 zdc 则把 zdc 替换成 run.sh 脚本的绝对路径
+55 5 * * * zdc reload
+
+```
+
+```bash
+# ./run.sh ssl -d 要签名的域名 -w 服务器里项目访问路径
 ./run.sh ssl -d mydomain.com -w /home/zdocker/www/mydomain.com/public
 
 # 证书生成成功会拷贝一份到 /config/nginx/conf.d/certs/mydomain.com/ 目录
@@ -215,23 +229,6 @@ ALTER USER `root`@`%` IDENTIFIED BY 'Q378238a',`root`@`%` PASSWORD EXPIRE NEVER;
 **Swoole 版本**
 
 默认情况安装的是最新版的 Swoole, 如果需要指定版本直接修改安装脚本 `config/php/extensions/php.sh`
-
-**swoole_tracker 扩展**
-
-安装之后需要手动设置启动并且重新启动 php 进程
-
-```bash
-# 先进入容器内
-zdc bash php
-# 执行命令设置扩展
-echo -e 'extension=/usr/local/etc/php/swoole-tracker/swoole_tracker73.so\napm.enable=1\napm.sampling_rate=100' > /usr/local/etc/php/conf.d/swoole-tracker.ini
-# 启动客户端
-nohup /opt/swoole/script/php/swoole_php /opt/swoole/node-agent/src/node.php 2>&1 &
-# 退出容器
-exit
-# 重新启动 php 进程
-zdc reload php
-```
 
 **启动失败**
 
