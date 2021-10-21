@@ -1,0 +1,4 @@
+ARG CADDY_IMAGES
+FROM ${CADDY_IMAGES}
+
+WORKDIR /var/www/html

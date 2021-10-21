@@ -72,6 +72,31 @@ services:
       defNetworks:
         ipv4_address: 172.0.0.10
 
+  ### caddy ##########
+  caddy:
+    build:
+      context: ./config/caddy/
+      args:
+        CADDY_IMAGES: ${CADDY_IMAGES}
+    ports:
+      - "${CADDY_HTTP_HOST_PORT}:80"
+      - "${CADDY_HTTPS_HOST_PORT}:443"
+    volumes:
+      - ${SOURCE_DIR}:/var/www/html/:rw
+      - ${CADDY_CONF_FILE}:/etc/caddy/Caddyfile:rw
+      - ${CADDY_SSL_DIR}:/root/.caddy/:rw
+      - ${CADDY_LOG_DIR}/caddy.log:/tmp/caddy.log:rw
+    restart: always
+    depends_on:
+      - php
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+      TZ: Asia/Shanghai
+    networks:
+      defNetworks:
+        ipv4_address: 172.0.0.11
+
   ### php ##########
   php:
     build:
