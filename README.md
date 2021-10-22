@@ -11,6 +11,7 @@
 ├── config
 │   ├── mysql
 │   │   └── mysql.cnf                      mysql.cnf 配置
+│   ├── caddy                              caddy 配置目录
 │   ├── nginx
 │   │   ├── conf.d                         vhost 配置目录
 │   │   │   ├── localhost.conf             默认站点配置
@@ -55,6 +56,8 @@ git clone --depth=1 https://github.com/sohaha/zls-docker.git
 ```
 
 3. 启动
+
+*默认配置使用 nginx 与 caddy 只能启动其中一个。*
 
 ```bash
 # 更多命令直接执行 run.sh 查看

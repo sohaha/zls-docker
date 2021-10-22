@@ -14,11 +14,13 @@
 	file_server
 }
 
-#https://73zls.com {
-# gzip
-# tls seekwe@gmail.com
-# proxy / 127.0.0.1:20000
-#}
+# https://73zls.com {
+# 	gzip
+# 	tls caddy@caddy.com
+# 	root * /var/www/html/xxx/public
+# 	file_server
+# 	proxy / 127.0.0.1:20000
+# }
 
 # Refer to the Caddy docs for more information:
 # https://caddyserver.com/docs/caddyfile
