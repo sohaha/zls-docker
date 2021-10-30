@@ -497,7 +497,7 @@ function _logs() {
 function _certbot() {
   local certsPath="$WORK_DIR"
   local ACME=~/.acme.sh/acme.sh
-  local binCmd=$certsPath/.run.sh
+  local binCmd=$certsPath/run.sh
   local zdc="$BIN_PATH/zdc"
   if [ -f "$zdc" ]; then
     binCmd=zdc
@@ -506,13 +506,14 @@ function _certbot() {
   local email
   local debug
   local force
+  local reloadcmd
   if [ ! -f "$ACME" ]; then
     tips "$ACME does not exist, installing..."
     curl https://get.acme.sh | sh
     # 自动更新
     $ACME --upgrade  --auto-upgrade
-    tips "Please set a scheduled task:"
-    echo -e "    55 5 * * * $cmd reload"
+    #tips "Please set a scheduled task:"
+    #echo -e "    55 5 * * * $cmd reload"
   fi
 
   if [[ "$1" == "" ]]; then
@@ -539,9 +540,6 @@ function _certbot() {
       error "Please enter the domain name"
   fi
 
-  if [[ -z "${reloadcmd}" ]]; then
-     reloadcmd='zdc reload'
-  fi
 
   if [[ -z ${webroot} && -n "${dns}" ]]; then
       # dns_cf
@@ -558,7 +556,7 @@ function _certbot() {
 
   ## --force --debug --reloadcmd "zdc reload"
 
-  $ACME --issue $dns $alias_str -d $domain $broad $webroot $args
+  $ACME --issue $dns $alias_str -d $domain $broad $webroot $args 
 
   if [ $? -ne 0 ]; then
     exit
@@ -566,8 +564,8 @@ function _certbot() {
 
   echo "create certs dir: $certsPath/config/nginx/conf.d/certs/$domain"
   mkdir -p $certsPath/config/nginx/conf.d/certs/$domain
-
-  $ACME --install-cert -d $domain $broad --key-file $certsPath/config/nginx/conf.d/certs/$domain/server.key --fullchain-file $certsPath/config/nginx/conf.d/certs/$domain/server.crt
+  
+  $ACME --install-cert -d $domain $broad --reloadcmd "${binCmd} reload" --key-file $certsPath/config/nginx/conf.d/certs/$domain/server.key --fullchain-file $certsPath/config/nginx/conf.d/certs/$domain/server.crt
 
   tips "reference:"
   echo "  cp $certsPath/config/nginx/conf.d/localhost_https.conf $certsPath/config/nginx/conf.d/[DOMAIN]_https.conf"

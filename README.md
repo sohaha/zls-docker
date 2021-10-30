@@ -186,22 +186,15 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 **首次使用**
 
 ```bash
-# 建议先把签证服务修改为 letsencrypt
+# 如果首次执行失败，建议先把签证服务修改为 letsencrypt
 ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
-
-# 配置定时任务 nginx 读取最新证书
-crontab -e
-
-# 填入以下命令，如果没有安装 zdc 则把 zdc 替换成 run.sh 脚本的绝对路径
-55 5 * * * zdc reload
-
 ```
 
 ```bash
 # ./run.sh ssl -d 要签名的域名 -w 服务器里项目访问路径
 ./run.sh ssl -d mydomain.com -w /home/zdocker/www/mydomain.com/public
 
-# 证书生成成功会拷贝一份到 /config/nginx/conf.d/certs/mydomain.com/ 目录
+# 证书生成成功会自动拷贝一份到 /config/nginx/conf.d/certs/mydomain.com/ 目录
 # https 的配置可以参考 config/nginx/conf.d/localhost_https.conf
 ```
 
