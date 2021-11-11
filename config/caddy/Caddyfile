@@ -22,5 +22,10 @@
 # 	proxy / 127.0.0.1:20000
 # }
 
+# http://73zls.com
+# {
+#  redir https://73zls.com{url}
+# }
+
 # Refer to the Caddy docs for more information:
 # https://caddyserver.com/docs/caddyfile
