@@ -61,7 +61,7 @@ services:
       - ${LUA_DIR}:/usr/local/openresty/nginx/conf/lua:rw
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
       - ${NGINX_CONF_FILE}:/usr/local/openresty/nginx/conf/nginx.conf:ro
-    restart: always
+    restart: on-failure
     depends_on:
       - php
     environment:
@@ -86,7 +86,7 @@ services:
       - ${CADDY_CONF_FILE}:/etc/caddy/Caddyfile:rw
       - ${CADDY_SSL_DIR}:/root/.caddy/:rw
       - ${CADDY_LOG_DIR}/caddy.log:/tmp/caddy.log:rw
-    restart: always
+    restart: on-failure
     depends_on:
       - php
     environment:
