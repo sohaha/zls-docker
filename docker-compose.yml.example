@@ -85,7 +85,7 @@ services:
       - ${SOURCE_DIR}:/var/www/html/:rw
       - ${CADDY_CONF_DIR}/Caddyfile:/etc/caddy/Caddyfile:rw
       - ${CADDY_CONF_DIR}/vhosts:/etc/caddy/vhosts:rw
-      - ${CADDY_SSL_DIR}:/root/.caddy/:rw
+      - ${CADDY_SSL_DIR}:/data/caddy/certificates/:rw
       - ${CADDY_LOG_DIR}:/tmp/caddylog:rw
     restart: on-failure
     depends_on:
@@ -94,6 +94,7 @@ services:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       REDIS_PASSWORD: "${REDIS_PASSWORD}"
       TZ: Asia/Shanghai
+      DNSPOD_TOKEN: "id,token"
     networks:
       defNetworks:
         ipv4_address: 172.0.0.11
