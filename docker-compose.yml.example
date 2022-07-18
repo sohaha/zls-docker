@@ -183,13 +183,15 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_INITDB_ROOT_PASSWORD}"
       TZ: Asia/Shanghai
     volumes:
-      - ${MONGODB_DATA_DIR}:/data/db:rw
-      - ${MONGODB_DATA_DIR}/mongo_key:/mongo:rw
+      - ${MONGODB_DATA_DIR}/data:/data/db:rw
+    # 配置集群
+      # - ${MONGODB_DATA_DIR}/keyFile:/data/mongodb/keyFile:r
+    # command: --auth --replSet rs0 --keyFile /data/mongodb/keyFile
+    command: --auth
     ports:
       - "${MONGODB_HOST_PORT}:27017"
     networks:
       - defNetworks
-    command: --auth
 
   ### sentry ##########
   sentry:

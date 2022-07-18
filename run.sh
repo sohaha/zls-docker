@@ -156,7 +156,7 @@ function judge() {
 
   type docker-compose >/dev/null 2>&1 || {
     tips 'command:'
-    tips '         sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose'
+    tips '         sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.6.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose'
     tips '         sudo chmod +x /usr/local/bin/docker-compose'
     error "Please install docker-compose!"
   }
@@ -200,8 +200,8 @@ function _installDocker() {
     tips 'OS is CentOS'
     tips 'command:'
     tips "        sudo curl -sSL https://get.docker.com | sh"
-    tips "        sudo usermod -aG docker your-user"
-    tips "        sudo curl -L https://get.daocloud.io/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
+    tips "        sudo usermod -aG docker $USER"
+    tips "        sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.6.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
     tips "        sudo chmod +x /usr/local/bin/docker-compose"
     tips "        docker-compose --version"
     tips "start:  "
@@ -211,8 +211,8 @@ function _installDocker() {
     tips 'OS is Ubuntu'
     tips 'command:'
     tips "        sudo curl -sSL https://get.docker.com | sh"
-    tips "        sudo usermod -aG docker your-user"
-    tips "        sudo curl -L https://get.daocloud.io/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
+    tips "        sudo usermod -aG docker $USER"
+    tips "        sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.6.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
     tips "        sudo chmod +x /usr/local/bin/docker-compose"
     tips "        docker-compose --version"
     tips "start:  "
