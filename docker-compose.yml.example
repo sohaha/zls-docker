@@ -185,6 +185,10 @@ services:
     volumes:
       - ${MONGODB_DATA_DIR}/data:/data/db:rw
     # 配置集群
+    #  openssl rand -base64 128 > ./data/mongo/keyFile && sudo chmod 600 ./data/mongo/keyFile && sudo chown 999:999 ./data/mongo/keyFile
+    #  mongo -u root -p 666666 --authenticationDatabase admin
+    #  rs.initiate({_id:"rs0", members:[{_id:0, host:"x.x.x.x:27017"}]})
+    #  rs.add("x.x.x.x:27017")
       # - ${MONGODB_DATA_DIR}/keyFile:/data/mongodb/keyFile:r
     # command: --auth --replSet rs0 --keyFile /data/mongodb/keyFile
     command: --auth
