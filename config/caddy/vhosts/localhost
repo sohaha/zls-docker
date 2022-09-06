@@ -5,6 +5,9 @@
 	# Enable the static file server.
 	file_server
 
+	# Redirect.
+	# redir https://www.73zls.com{uri}
+
 	# Another common task is to set up a reverse proxy:
 	# reverse_proxy localhost:8080
 

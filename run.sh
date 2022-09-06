@@ -201,6 +201,7 @@ function _installDocker() {
     tips 'command:'
     tips "        sudo curl -sSL https://get.docker.com | sh"
     tips "        sudo usermod -aG docker $USER"
+    tips "        newgrp docker"
     tips "        sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.6.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
     tips "        sudo chmod +x /usr/local/bin/docker-compose"
     tips "        docker-compose --version"
@@ -212,6 +213,7 @@ function _installDocker() {
     tips 'command:'
     tips "        sudo curl -sSL https://get.docker.com | sh"
     tips "        sudo usermod -aG docker $USER"
+    tips "        newgrp docker"
     tips "        sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.6.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
     tips "        sudo chmod +x /usr/local/bin/docker-compose"
     tips "        docker-compose --version"
