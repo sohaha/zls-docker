@@ -318,7 +318,7 @@ services:
   ### drone ##########
   # 配置文档 https://docs.drone.io/server/overview/
   drone:
-    image: drone/drone:1
+    image: drone/drone:2
     volumes:
       - ./data/drone:/var/lib/drone/
       - /var/run/docker.sock:/var/run/docker.sock
@@ -329,6 +329,9 @@ services:
       - DRONE_GITLAB_CLIENT_SECRET=xxx
       - DRONE_GITLAB_SERVER=http://gitlab.xxx.com
       - DRONE_GITLAB_SKIP_VERIFY=true
+      - DRONE_GITLAB_SKIP_VERIFY=true
+      # 建议设置指定分组或用户，逗号分隔
+      # - DRONE_USER_FILTER=
       # 输出日志
       - DRONE_LOGS_DEBUG=true
       - DRONE_OPEN=true
@@ -346,7 +349,7 @@ services:
       - drone-runner
 
   drone-runner:
-    image: drone/drone-runner-docker:1
+    image: drone/drone-runner-docker:1.8
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
