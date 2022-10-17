@@ -329,7 +329,6 @@ services:
       - DRONE_GITLAB_CLIENT_SECRET=xxx
       - DRONE_GITLAB_SERVER=http://gitlab.xxx.com
       - DRONE_GITLAB_SKIP_VERIFY=true
-      - DRONE_GITLAB_SKIP_VERIFY=true
       # 建议设置指定分组或用户，逗号分隔
       # - DRONE_USER_FILTER=
       # 输出日志
