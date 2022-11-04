@@ -2,8 +2,14 @@
 	# Set this path to your site's directory.
 	root * /var/www/html/localhost
 
+    # compress
+	encode gzip 
+
 	# Enable the static file server.
-	file_server
+    file_server {
+		precompressed br gzip
+        hide .git .git/ .git/* .git* .gitignore
+    }
 
 	# Redirect.
 	# redir https://www.73zls.com{uri}

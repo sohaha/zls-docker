@@ -156,7 +156,7 @@ function judge() {
 
   type docker-compose >/dev/null 2>&1 || {
     tips 'command:'
-    tips '         sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.6.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose'
+    tips '         sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.12.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose'
     tips '         sudo chmod +x /usr/local/bin/docker-compose'
     error "Please install docker-compose!"
   }
@@ -565,7 +565,7 @@ function _certbot() {
 
   ## --force --debug --reloadcmd "zdc reload"
 
-  $ACME --issue $dns $alias_str -d $domain $broad $webroot $args 
+  $ACME --issue $dns $alias_str -d $domain $broad $webroot $args
 
   if [ $? -ne 0 ]; then
     exit
@@ -573,7 +573,7 @@ function _certbot() {
 
   echo "create certs dir: $certsPath/config/nginx/conf.d/certs/$domain"
   mkdir -p $certsPath/config/nginx/conf.d/certs/$domain
-  
+
   $ACME --install-cert -d $domain $broad --reloadcmd "${binCmd} reload" --key-file $certsPath/config/nginx/conf.d/certs/$domain/server.key --fullchain-file $certsPath/config/nginx/conf.d/certs/$domain/server.crt
 
   tips "reference:"
