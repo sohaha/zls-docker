@@ -98,11 +98,12 @@ PHP_EXTENSIONS=swoole,redis
 !> 请确定 crontab 下 docker-compose 能正常使用，如果不能请尝试执行 `sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose` 再试。
 
 ```bash
-# 假设是需要每分钟执行一次 www/test/task.php
+# 假设本脚本放在 /root/zls-docker 目录下
+# 需要每分钟执行一次 www/test/task.php
 
 # crontab -e
 # 下面语句就是每分钟进入 php 容器 执行 `php test/task.php`
-* * * * * zdc cron php php test/task.php
+* * * * * /root/zls-docker/run.sh cron php php test/task.php
 ```
 
 ### 数据库使用
@@ -214,13 +215,14 @@ ALTER USER `root`@`%` IDENTIFIED BY 'xxx1990hi',`root`@`%` PASSWORD EXPIRE NEVER
 建议设置定时任务，定时备份数据库，如下：
 
 ```bash
+# 假设本脚本放在 /root/zls-docker 目录下
 # crontab -e
 
 # 每天凌晨三点备份 MySQL 数据库
-00 03 * * * zdc mysql backup
+00 03 * * * /root/zls-docker/run.sh mysql backup
 
 # 每天凌晨三点备份 MongoDB 数据库
-00 03 * * * zdc mongodb backup
+00 03 * * * /root/zls-docker/run.sh mongodb backup
 
 ```
 
