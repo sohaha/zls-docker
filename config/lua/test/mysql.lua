@@ -16,7 +16,7 @@ local ok, err, errcode, sqlstate = db:connect({
     port = 3306,
     database = "mysql",
     user = "root",
-    password = "666666"})
+    password = "73zls666"})
 
 if not ok then
     ngx.log(ngx.ERR, "failed to connect: ", err, ": ", errcode, " ", sqlstate)

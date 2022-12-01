@@ -21,6 +21,7 @@ WORK_NAME=${WORK_DIR##*/}
 SCRIPT_SOURCE_DIR=$(pwd)
 WHOAMI=$(whoami)
 TIME=$(date "+%Y-%m-%d %H:%M:%S")
+DATE=$(date "+%Y-%m-%d")
 cd $WORK_DIR
 
 function main() {
@@ -98,6 +99,9 @@ function main() {
     ;;
   mysql)
     _mysqlTools $@
+    ;;
+  mongodb)
+    _mongodbTools $@
     ;;
   installDocker | installdocker)
     _installDocker
@@ -584,12 +588,15 @@ function _mysqlTools() {
   local yes=0
   local BAK_DIR="$MYSQL_CONF_DIR/backup"
   local BAK_FILE="$BAK_DIR/$TIME.sql"
+  local DAYS=15
   mkdir -p $BAK_DIR
-  if [[ "bak" == $1 ]]; then
+  if [[ "backup" == $1 ]]; then
     cat >$BAK_DIR/.bak_mysql.sh<<EOF
 #!/usr/bin/env bash
 
 mysql -e "show databases;" -uroot -p${MYSQL_ROOT_PASSWORD} | grep -Ev "Database|information_schema|mysql|test|performance_schema|information_schema" | xargs mysqldump -uroot -p${MYSQL_ROOT_PASSWORD} --databases > "/mysql/backup/${TIME}.sql"
+
+find /mysql/backup/ -mtime +$DAYS -delete
 EOF
     _bash mysql chmod 777 /mysql/backup/.bak_mysql.sh
     _bash mysql /mysql/backup/.bak_mysql.sh
@@ -665,6 +672,37 @@ EOF
     echo "Please enter the correct option"
     ;;
   esac
+}
+
+function _mongodbTools() {
+  local yes=0
+  local BAK_DIR="${MONGODB_CONF_DIR:-./config/mongodb}/backup"
+  local BAK_FILE="$BAK_DIR/$DATE"
+  local DAYS=15
+  mkdir -p $BAK_FILE
+  if [[ "backup" == $1 ]]; then
+    cat >$BAK_DIR/.bak.sh<<EOF
+#!/usr/bin/env bash
+
+mongodump  -u ${MONGODB_INITDB_ROOT_USERNAME} -p ${MONGODB_INITDB_ROOT_PASSWORD}  --authenticationDatabase admin  -o /backup/${DATE}
+tar -zcvf /backup/${DATE}.tar.gz /backup/${DATE}
+rm -rf /backup/${DATE}
+find /backup/ -mtime +$DAYS -delete
+EOF
+    _bash mongodb chmod 777 /backup/.bak.sh
+    _bash mongodb /backup/.bak.sh
+    if [ $? -eq 0 ];then
+      echo "bak database Sucessfully."
+      echo "export -> $BAK_FILE"
+    else
+      echo "bak database failed!"
+      echo $(pwd)
+      echo $BAK_DIR
+      cat $BAK_DIR/.bak.sh
+    fi
+    rm -f $BAK_DIR/.bak.sh
+    exit
+  fi
 }
 
 function __Enter_Database_Name()

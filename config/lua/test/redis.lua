@@ -10,7 +10,7 @@ Last Modified time: 2020-08-13 18:24:22
 -- redis config
 local redis = require "resty.redis"
 local red = redis:new()
-local redis_passwd = "666666"
+local redis_passwd = "73zls666"
 local redis_host = "172.0.0.40"
 
 local ok, err = red:connect(redis_host, 6379)

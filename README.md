@@ -111,9 +111,9 @@ PHP_EXTENSIONS=swoole,redis
 
 - 如需修改默认密码，编辑.env 文件即可，
 
-  MySQL：`MYSQL_ROOT_PASSWORD=666666`，
+  MySQL：`MYSQL_ROOT_PASSWORD=73zls666`，
 
-  mongo：`MONGODB_INITDB_ROOT_PASSWORD=666666`
+  mongo：`MONGODB_INITDB_ROOT_PASSWORD=73zls666`
 
   必须在容器生成之前，如果容器已经生成过，
 
@@ -206,8 +206,22 @@ nginx，php-fpm 之类的修改了配置是需要重新加载的，可使用该�
 把 `MYSQL_HOST_PORT=127.0.0.1:3306` 改成 `MYSQL_HOST_PORT=3306`
 
 ```mysql
-# 为了安全性建议把 %.root 的密码修改成其他密码（默认密码：666666）
-ALTER USER `root`@`%` IDENTIFIED BY 'Q378238a',`root`@`%` PASSWORD EXPIRE NEVER;
+# 为了安全性建议把 %.root 的密码修改成其他密码（默认密码：73zls666）
+ALTER USER `root`@`%` IDENTIFIED BY 'xxx1990hi',`root`@`%` PASSWORD EXPIRE NEVER;
+```
+
+**数据库备份**
+建议设置定时任务，定时备份数据库，如下：
+
+```bash
+# crontab -e
+
+# 每天凌晨三点备份 MySQL 数据库
+00 03 * * * zdc mysql backup
+
+# 每天凌晨三点备份 MongoDB 数据库
+00 03 * * * zdc mongodb backup
+
 ```
 
 **MongoDB 启动失败**
@@ -250,11 +264,11 @@ zdc bash sentry sentry upgrade
 # 进入 mogodb 内 建立 Yapi 账号
 ./run.sh bash mongodb
 # 进入 mongo 数据库
-mongo -u root -p 666666
+mongo -u root -p 73zls666
 # 进入 Yapi 库
 use yapi
 # 添加一个用户 然后 Ctrl+c退出数据库 exit 退出容器
-db.createUser({user: "yapi",pwd: "666666",roles: [{role: "dbOwner",db: "yapi"}]})
+db.createUser({user: "yapi",pwd: "73zls666",roles: [{role: "dbOwner",db: "yapi"}]})
 # 默认账号密码 admin@admin.com ymfe.org
 # 启动 yapi (上面步骤只要执行一次)
 ./run.sh up yapi
