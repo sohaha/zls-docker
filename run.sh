@@ -24,6 +24,8 @@ TIME=$(date "+%Y-%m-%d %H:%M:%S")
 DATE=$(date "+%Y-%m-%d")
 cd $WORK_DIR
 
+[[ ! $PATH =~ $BIN_PATH ]] && export PATH=$PATH:$BIN_PATH
+
 function main() {
   if [[ ! -d $BIN_PATH ]]; then
     BIN_PATH="/usr/bin"
