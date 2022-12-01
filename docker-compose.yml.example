@@ -184,6 +184,7 @@ services:
       TZ: Asia/Shanghai
     volumes:
       - ${MONGODB_DATA_DIR}/data:/data/db:rw
+      - ./config/mongodb/backup:/backup:rw
     # 配置集群
     #  openssl rand -base64 128 > ./data/mongo/keyFile && sudo chmod 600 ./data/mongo/keyFile && sudo chown 999:999 ./data/mongo/keyFile
     #  mongo -u root -p 73zls666 --authenticationDatabase admin
