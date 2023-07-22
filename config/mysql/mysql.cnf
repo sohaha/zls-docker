@@ -24,6 +24,8 @@
 # log-error               = /var/lib/mysql/mysql.error.log
 # # mysql 5.7 Please note the following
 # log-bin                 = /var/lib/mysql/logbin.log
+# # close log
+# skip-log-bin
 # default-time-zone       = '+8:00'
 # # skip-grant-tables
 #
