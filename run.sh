@@ -154,18 +154,65 @@ function _help() {
   echo ' ......'
 }
 
-function judge() {
-  type docker >/dev/null 2>&1 || {
-    _installDocker
-    error "Please install Docker!"
-  }
+function command_exists() {
+	command -v "$1" 2>&1
+}
 
-  type docker-compose >/dev/null 2>&1 || {
-    tips "command:"
-    tips "         sudo curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
-    tips "         sudo chmod +x /usr/local/bin/docker-compose"
-    error "Please install docker-compose!"
-  }
+function start_docker() {
+    systemctl start docker && systemctl enable docker
+}
+
+function confirm() {
+    echo -e -n "\033[34m$* \033[1;36m(Y/n)\033[0m"
+    read -n 1 -s opt
+
+    [[ "$opt" == $'\n' ]] || echo
+
+    case "$opt" in
+        'y' | 'Y' ) return 0;;
+        'n' | 'N' ) return 1;;
+        *) confirm "$1";;
+    esac
+}
+
+function judge() {
+  if [ -z `command_exists docker` ]; then
+    tips "Missing Docker environment"
+    if confirm "Do you need to install Docker automatically?"; then
+        curl -sSLk https://get.docker.com/ | bash
+        if [ $? -ne "0" ]; then
+            error "Docker installation failed"
+        fi
+        tips "Docker installation complete"
+    else
+        error "Abort installation"
+    fi
+  fi
+
+  if [ -z `command_exists "docker-compose"` ]; then
+      tips "Docker-compose component not found"
+      if confirm "Whether the Docker Compose Plugin needs to be installed automatically"; then
+          curl -sSLk https://get.docker.com/ | bash
+          if [ $? -ne "0" ]; then
+              error "Docker Compose Plugin installation failed"
+          fi
+          tips "Docker Compose Plugin installation complete"
+      else
+          error "Abort installation"
+      fi
+  fi
+
+  # type docker >/dev/null 2>&1 || {
+  #   _installDocker
+  #   error "Please install Docker!"
+  # }
+
+  # type docker-compose >/dev/null 2>&1 || {
+  #   tips "command:"
+  #   tips "         sudo curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
+  #   tips "         sudo chmod +x /usr/local/bin/docker-compose"
+  #   error "Please install docker-compose!"
+  # }
 }
 
 function askRoot() {

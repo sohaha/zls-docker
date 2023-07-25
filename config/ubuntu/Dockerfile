@@ -10,8 +10,12 @@ ENV GOPROXY=https://goproxy.cn
 ENV PATH=$PATH:/root/.go/bin:/root/.go/current/bin
 
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list && apt-get clean
+
 # RUN apt update && apt install curl -y
 # curl -sSf https://raw.githubusercontent.com/owenthereal/goup/master/install.sh | sh -s -- '--skip-prompt'
 
 # apt install -y manpages-dev
 # RUN tail -F /dev/null
+
+# gcc
+# apt update && apt install -y gcc build-essential 
