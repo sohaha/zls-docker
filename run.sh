@@ -179,6 +179,7 @@ function judge() {
   if [ -z `command_exists docker` ]; then
     tips "Missing Docker environment"
     if confirm "Do you need to install Docker automatically?"; then
+        # askRoot
         curl -sSLk https://get.docker.com/ | bash
         if [ $? -ne "0" ]; then
             error "Docker installation failed"
@@ -192,10 +193,11 @@ function judge() {
   if [ -z `command_exists "docker-compose"` ]; then
       tips "Docker-compose component not found"
       if confirm "Whether the Docker Compose Plugin needs to be installed automatically"; then
-          curl -sSLk https://get.docker.com/ | bash
+          curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
           if [ $? -ne "0" ]; then
               error "Docker Compose Plugin installation failed"
           fi
+          chmod +x /usr/local/bin/docker-compose
           tips "Docker Compose Plugin installation complete"
       else
           error "Abort installation"
