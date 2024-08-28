@@ -190,18 +190,20 @@ function judge() {
     fi
   fi
 
-  if [ -z `command_exists "docker-compose"` ]; then
-      tips "Docker-compose component not found"
-      if confirm "Whether the Docker Compose Plugin needs to be installed automatically"; then
-          curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-          if [ $? -ne "0" ]; then
-              error "Docker Compose Plugin installation failed"
-          fi
-          chmod +x /usr/local/bin/docker-compose
-          tips "Docker Compose Plugin installation complete"
-      else
-          error "Abort installation"
-      fi
+  if [ -z `command_exists docker compose` ]; then
+    if [ -z `command_exists docker-compose` ]; then
+        tips "Docker-compose component not found"
+        if confirm "Whether the Docker Compose Plugin needs to be installed automatically"; then
+            curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+            if [ $? -ne "0" ]; then
+                error "Docker Compose Plugin installation failed"
+            fi
+            chmod +x /usr/local/bin/docker-compose
+            tips "Docker Compose Plugin installation complete"
+        else
+            error "Abort installation"
+        fi
+    fi
   fi
 
   # type docker >/dev/null 2>&1 || {
@@ -376,7 +378,7 @@ function _bash() {
       cmd="sh"
     fi
   fi
-  docker-compose exec $container $cmd
+  compose exec $container $cmd
 }
 
 function _bash2() {
@@ -396,7 +398,7 @@ function _bash2() {
       cmd="sh"
     fi
   fi
-  docker-compose exec -T $container $cmd
+  compose exec -T $container $cmd
 }
 
 function _cron() {
@@ -417,15 +419,15 @@ function _cron() {
       cmd="sh"
     fi
   fi
-   docker-compose exec -T $container $cmd
+  compose exec -T $container $cmd
 }
 
 function _stop() {
-  docker-compose stop $@
+  compose stop $@
 }
 
 function _status() {
-  docker-compose ps
+  compose ps
 }
 
 function _start() {
@@ -435,7 +437,7 @@ function _start() {
     echo "No service is specified (default service): $defaultContainer"
     container=$defaultContainer
   fi
-  docker-compose up -d $container
+  compose up -d $container
 }
 
 function _restart() {
@@ -445,7 +447,7 @@ function _restart() {
     echo "No service is specified (default service): $defaultContainer"
     container=$defaultContainer
   fi
-  docker-compose restart $container
+  compose restart $container
 }
 
 function _reload() {
@@ -483,7 +485,7 @@ function _build() {
   if [[ "" == $container ]]; then
     error "Please enter the compiled service"
   else
-    docker-compose build $container
+    compose build $container
   fi
 }
 
@@ -546,8 +548,16 @@ function images() {
   if [[ "" == $(echo $(docker images) | grep $WORK_NAME"_"$container) ]]; then
     tips "The $container service is for the first time, please wait ..."
     _start --build $container
-  elif [[ "" == $(echo $(docker-compose images) | grep $WORK_NAME"_"$container) ]]; then
+  elif [[ "" == $(echo $(compose images) | grep $WORK_NAME"_"$container) ]]; then
     _start $container
+  fi
+}
+
+function compose() {
+  if [ -z `command_exists "docker-compose"` ]; then
+    docker compose $@
+  elif [ -z `command_exists "docker compose"` ]; then
+    docker-compose $@
   fi
 }
 
@@ -557,7 +567,7 @@ function __path() {
 
 function _logs() {
   local container=$1
-  docker-compose logs $container
+  compose logs $container
 }
 
 function _certbot() {
@@ -789,7 +799,7 @@ function _inspect() {
 }
 
 function __yapi() {
-  docker-compose up -d yapi
+  compose up -d yapi
   tips "yapi: http://127.0.0.1:$YAPI_HOST_PORT"
 }
 
@@ -797,7 +807,7 @@ function __sentry() {
   local cmd=${BASH_SOURCE[0]}
   # shellcheck disable=SC2001
   cmd=$(echo $cmd | sed 's:\/usr\/bin\/::g')
-  docker-compose up -d sentry sentry_celery_beat sentry_celery_worker
+  compose up -d sentry sentry_celery_beat sentry_celery_worker
   tips "For the first time, please execute the following command to initialize sentry:\n"
   tips "  $cmd sentry upgrade"
   tips ""
