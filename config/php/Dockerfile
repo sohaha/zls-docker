@@ -25,7 +25,7 @@ RUN export MC="-j$(nproc)" \
     && sh "${MORE_EXTENSION_INSTALLER}" \
     && php -v \
     && php -m \
-    && bash install-composer.sh \
+    && sh install-composer.sh \
     && rm -rf /tmp/extensions 
 
 WORKDIR /var/www/html
